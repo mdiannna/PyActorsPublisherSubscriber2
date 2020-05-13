@@ -68,6 +68,7 @@ class WorkerSupervisor(Actor):
     def process_panic_message(self, current_worker):
         # print("PANIC")
         self.publish("print-topic", str({"text":"!!! PANIC !!!", "type":'warning-bold'}))
+        # TODO!!!!! publish
         current_worker.inbox.put("PANIC")
 
     def process_worker_fail(self, current_worker):
@@ -184,6 +185,7 @@ class WorkerSupervisor(Actor):
             self.publish("print-topic", str({"text":"Sending work to worker %s [%d]" % (current_worker.name, self.inbox.qsize()), "type":"warning"}))
             
             # self.publish("worker-data-topic-" + self.route, message)
+            # TODO!!!!! publish
             current_worker.inbox.put(message)
             self.workers.put(current_worker)
 
