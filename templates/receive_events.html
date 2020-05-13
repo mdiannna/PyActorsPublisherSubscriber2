@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html>
+  <head> 
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Weather predict actors</title>
+    <meta name="description" content="">
+    <!-- Refresh every 10 seconds -->
+    <!-- <meta http-equiv="refresh" content="10">                 -->
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="all,follow">
+    <!-- Bootstrap CSS-->
+    <link rel="stylesheet" href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.min.css')}}">
+    <!-- Font Awesome CSS-->
+    <link rel="stylesheet" href="{{ url_for('static', filename='vendor/font-awesome/css/font-awesome.min.css')}}">
+    <!-- Custom Font Icons CSS-->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/font.css')}}">
+    <!-- Google fonts - Muli-->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Muli:300,400,700">
+    <!-- theme stylesheet-->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.default.css')}}" id="theme-stylesheet">
+    <!-- Custom stylesheet - for your changes-->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css')}}">
+    <!-- Favicon-->
+    <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico')}}">
+    <!-- Tweaks for older IEs--><!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+        <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script><![endif]-->
+    <style type="text/css">
+		.statistic-block .number {
+			font-size: 18px !important;
+		}
+
+    .incoming-data-div {
+      max-height: 80vh;
+    }
+    </style>
+  </head>
+  <body>
+    <header class="header">   
+     	<!-- <h2>tEST RECEIVE EVENTS</h2> -->
+	<!-- <div id="messages"></div> -->
+
+    </header>
+    <div class="d-flex align-items-stretch">
+      <!-- Sidebar Navigation-->
+      <nav id="sidebar" style="display: none;">
+        <!-- Sidebar Header-->
+        <div class="sidebar-header d-flex align-items-center">
+          <div class="avatar"><img src="{{ url_for('static', filename='img/avatar-6.jpg')}}" alt="..." class="img-fluid rounded-circle"></div>
+          <div class="title">
+            <h1 class="h5">Mark Stephen</h1>
+            <p>Web Designer</p>
+          </div>
+        </div>
+        <!-- Sidebar Navidation Menus--><span class="heading">Main</span>
+        <ul class="list-unstyled">
+          <li class="active"><a href="index.html"> <i class="icon-home"></i>Home </a></li>
+          <li><a href="tables.html"> <i class="icon-grid"></i>Tables </a></li>
+          <li><a href="charts.html"> <i class="fa fa-bar-chart"></i>Charts </a></li>
+          <li><a href="forms.html"> <i class="icon-padnote"></i>Forms </a></li>
+          <li><a href="#exampledropdownDropdown" aria-expanded="false" data-toggle="collapse"> <i class="icon-windows"></i>Example dropdown </a>
+            <ul id="exampledropdownDropdown" class="collapse list-unstyled ">
+              <li><a href="#">Page</a></li>
+              <li><a href="#">Page</a></li>
+              <li><a href="#">Page</a></li>
+            </ul>
+          </li>
+          <li><a href="login.html"> <i class="icon-logout"></i>Login page </a></li>
+        </ul><span class="heading">Extras</span>
+        <ul class="list-unstyled">
+          <li> <a href="#"> <i class="icon-settings"></i>Demo </a></li>
+          <li> <a href="#"> <i class="icon-writing-whiteboard"></i>Demo </a></li>
+          <li> <a href="#"> <i class="icon-chart"></i>Demo </a></li>
+        </ul>
+      </nav>
+      <!-- Sidebar Navigation end-->
+      <!-- <div class="page-content"> -->
+      <div class="page-content-no-sidebar">
+        <div class="page-header">
+          <div class="container-fluid">
+            <h2 class="h5 no-margin-bottom">Dashboard</h2>
+          </div>
+        </div>
+        <section class="no-padding-top no-padding-bottom">
+          <div class="container-fluid">
+            <div class="row" id="lastUpdateDiv">
+                <!-- Last update: 15.02.2020 22:33 -->
+            </div>
+
+            <div class="row">
+              <div class="col-md-3 col-sm-6">
+                <div class="statistic-block block">
+                  <div class="progress-details d-flex align-items-end justify-content-between">
+                    <div class="title">
+                      <div class="icon"><i class="fa fa-sun-o"></i></div><strong>Light</strong>
+                    </div>
+                    <div class="number dashtext-1" id="light">-</div>
+                  </div>
+                  <div class="progress progress-template">
+                    <div role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" class="progress-bar progress-bar-template dashbg-1"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3 col-sm-6">
+                <div class="statistic-block block">
+                  <div class="progress-details d-flex align-items-end justify-content-between">
+                    <div class="title">
+                      <div class="icon"><i class="fa fa-umbrella"></i></div><strong>Humidity</strong>
+                    </div>
+                    <div class="number dashtext-2" id="humidity">-</div>
+                  </div>
+                  <div class="progress progress-template">
+                    <div role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" class="progress-bar progress-bar-template dashbg-2"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3 col-sm-6">
+                <div class="statistic-block block">
+                  <div class="progress-details d-flex align-items-end justify-content-between">
+                    <div class="title">
+                      <div class="icon"><i class="fa fa-thermometer"></i></div><strong>Temperature</strong>
+                    </div>
+                    <div class="number dashtext-3" id="temp">-</div>
+                  </div>
+                  <div class="progress progress-template">
+                    <div role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" class="progress-bar progress-bar-template dashbg-3"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3 col-sm-6">
+                <div class="statistic-block block">
+                  <div class="progress-details d-flex align-items-end justify-content-between">
+                    <div class="title">
+                      <div class="icon"><i class="fa fa-reorder"></i></div><strong>Wind speed</strong>
+                    </div>
+                    <div class="number dashtext-4" id="wind">-</div>
+                  </div>
+                  <div class="progress progress-template">
+                    <div role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" class="progress-bar progress-bar-template dashbg-4"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+            	<div class="col-md-3 col-sm-6">
+              </div>
+              <div class="col-md-3 col-sm-6">
+                <div class="statistic-block block">
+                  <div class="progress-details d-flex align-items-end justify-content-between">
+                    <div class="title">
+                      <div class="icon"><i class="fa fa-reorder"></i></div><strong>Atm. pressure</strong>
+                    </div>
+                    <div class="number dashtext-4" id="atm-pressure">-</div>
+                  </div>
+                  <div class="progress progress-template">
+                    <div role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" class="progress-bar progress-bar-template dashbg-4"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-3 col-sm-6">
+                <div class="statistic-block block">
+                  <div class="progress-details d-flex align-items-end justify-content-between">
+                    <div class="title">
+                      <div class="icon"><i class="fa fa-clock-o"></i></div><strong>Timestamp</strong>
+                    </div>
+                    <div class="number dashtext-3" id="timestamp">-</div>
+                  </div>
+                  <div class="progress progress-template">
+                    <div role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" class="progress-bar progress-bar-template dashbg-3"></div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- <div class="col-md-3 col-sm-6">
+                <div class="statistic-block block">
+                  <div class="progress-details d-flex align-items-end justify-content-between">
+                    <div class="title">
+                      <div class="icon"><i class="fa fa-umbrella"></i></div><strong>Humidity</strong>
+                    </div>
+                    <div class="number dashtext-2">375</div>
+                  </div>
+                  <div class="progress progress-template">
+                    <div role="progressbar" style="width: 70%" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100" class="progress-bar progress-bar-template dashbg-2"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3 col-sm-6">
+                <div class="statistic-block block">
+                  <div class="progress-details d-flex align-items-end justify-content-between">
+                    <div class="title">
+                      <div class="icon"><i class="fa fa-sun-o"></i></div><strong>Light</strong>
+                    </div>
+                    <div class="number dashtext-1">27</div>
+                  </div>
+                  <div class="progress progress-template">
+                    <div role="progressbar" style="width: 30%" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100" class="progress-bar progress-bar-template dashbg-1"></div>
+                  </div>
+                </div>
+              </div>
+               -->
+            </div>
+          </div>
+        </section>
+        <section class="no-padding-bottom">
+          <div class="container-fluid">
+            <div class="row">
+              <div class="col-lg-4" >
+                <div class="block">
+                <div class="icon"></div><strong>Weather forecast </strong>
+                <div id="predictDataDiv">
+                	
+                </div>
+                <br>
+                <img src="{{ url_for('static', filename='img/weather/sun.gif')}}" class="img img-fluid" id="prediction-img">
+                
+
+                <!-- <div class="bar-chart block no-margin-bottom">
+                  <canvas id="barChartExample1"></canvas>
+                </div>
+                <div class="bar-chart block">
+                  <canvas id="barChartExample2"></canvas>
+                </div> -->
+                </div>
+
+               
+              
+
+              </div>
+             
+              <div class="col-lg-8">
+                <div class="checklist-block block">
+                  <div class="title"><strong>Incoming data</strong></div>
+                  <div id="incoming-data"  class="overflow-auto incoming-data-div" >
+                    
+                  </div>
+                </div>
+              </div>
+             </div>
+              
+          </div>
+        </section>
+
+        <footer class="footer">
+          <div class="footer__block block no-margin-bottom">
+            <div class="container-fluid text-center">
+              <!-- Please do not remove the backlink to us unless you support us at https://bootstrapious.com/donate. It is part of the license conditions. Thank you for understanding :)-->
+              <p class="no-margin-bottom">2020 &copy; Marusic Diana. Design by <a href="https://bootstrapious.com/p/bootstrap-4-dark-admin">Bootstrapious</a>.</p>
+            </div>
+          </div>
+        </footer>
+      </div>
+    </div>
+    <!-- JavaScript files-->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/popper.js/umd/popper.min.js"> </script>
+    <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
+    <script src="vendor/jquery.cookie/jquery.cookie.js"> </script>
+    <script src="vendor/chart.js/Chart.min.js"></script>
+    <script src="vendor/jquery-validation/jquery.validate.min.js"></script>
+    <script src="js/charts-home.js"></script>
+    <script src="js/front.js"></script>
+
+<script type="text/javascript">
+
+ function updateCurrentTime() {
+	var today = new Date();
+	var date = today.getDate()+'.'+(today.getMonth()+1)+'.'+today.getFullYear();
+	var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+	var dateTime = date+' '+time;
+
+	var lastUpdateDiv = document.getElementById("lastUpdateDiv");
+	lastUpdateDiv.innerHTML = "Last update: " + dateTime;
+ }
+
+
+	var messagesDiv = document.getElementById("messages");
+	var incomingDataDiv = document.getElementById("incoming-data");
+	var incomingDataCnt = 0;
+
+	var source = new EventSource("{{ url_for('sse.stream') }}");
+source.addEventListener('greeting', function(event) {
+    var data = JSON.parse(event.data);
+    console.log(data);
+    incomingDataCnt += 1;
+
+    message= data["message"];
+
+
+    if(message.startsWith("PREDICTED_WEATHER_FINAL:")) {
+    	prediction = message.substring(24);
+	    predictDataDiv.innerHTML = "<p>" + prediction + "</p>";
+    	updateImageByPrediction(prediction);
+    	updateCurrentTime(message);
+    } 
+
+    else if(message.startsWith("DATA:")) {
+    	setSensorData(message);
+
+	    // messagesDiv.append(data["message"]);
+	    to_append = `<div class="item d-flex align-items-center">
+	                      <label for="input-1">` + data["message"] + `</label>
+	                    </div>`;
+	    // incomingDataDiv.append(to_append);
+	    // $("#incoming-data").append(to_append);
+	    incomingDataDiv.innerHTML += to_append;
+
+	    if(incomingDataCnt > 20) {
+	    	incomingDataDiv.innerHTML = "";
+	    	incomingDataCnt = 0;
+	    }
+    } else {
+    	alert(message);
+    }
+
+
+}, false);
+
+   source.addEventListener('error', function(event) {
+        console.log("Failed to connect to event stream. Is Redis running?");
+    }, false);
+ 
+
+		function setSensorDataAllValues(data) {
+			str1 = "temperature_sensor_1': ";
+			temp1 = data.substring(data.search(str1) + str1.length, data.search(str1) + str1.length + 5.0);
+			str1 = "temperature_sensor_2': ";
+			temp2 = data.substring(data.search(str1) + str1.length, data.search(str1) + str1.length + 5.0);
+
+			str1 = "light_sensor_1': ";
+			light1 = data.substring(data.search(str1) + str1.length, data.search(str1) + str1.length + 5.0);
+			str1 = "light_sensor_2': ";
+			light2 = data.substring(data.search(str1) + str1.length, data.search(str1) + str1.length + 5.0);
+
+			str1 = "humidity_sensor_1': ";
+			humidity1 = data.substring(data.search(str1) + str1.length, data.search(str1) + str1.length + 5.0);
+			str1 = "humidity_sensor_2': ";
+			humidity2 = data.substring(data.search(str1) + str1.length, data.search(str1) + str1.length + 5.0);
+
+			str1 = "atmo_pressure_sensor_1': ";
+			atmo1 = data.substring(data.search(str1) + str1.length, data.search(str1) + str1.length + 5.0);
+			str1 = "atmo_pressure_sensor_2': ";
+			atmo2 = data.substring(data.search(str1) + str1.length, data.search(str1) + str1.length + 5.0);
+
+			str1 = "wind_sensor_1': ";
+			wind1 = data.substring(data.search(str1) + str1.length, data.search(str1) + str1.length + 5.0);
+			str1 = "wind_sensor_2': ";
+			wind2 = data.substring(data.search(str1) + str1.length, data.search(str1) + str1.length + 5.0);
+
+			str1 = "unix_timestamp_us': ";
+			timestamp = data.substring(data.search(str1) + str1.length, data.search(str1) + str1.length + 5.0);
+
+			document.getElementById("temp").innerHTML = "<p>" + temp1 + "/" + temp2 + "</p>";
+			document.getElementById("humidity").innerHTML = "<p>" + humidity1 + "/" + humidity2 + "</p>";
+			document.getElementById("light").innerHTML = "<p>" + light1 + "/" + light2 + "</p>";
+			document.getElementById("wind").innerHTML = "<p>" + wind1 + "/" + wind2 + "</p>";
+			document.getElementById("atm-pressure").innerHTML = "<p>" + atmo1 + "/" + atmo2 + "</p>";
+			document.getElementById("timestamp").innerHTML = "<p>" + timestamp  + "</p>";
+		}
+
+    function setSensorData(data) {
+      str1 = "temperature': ";
+      temp1 = data.substring(data.search(str1) + str1.length, data.search(str1) + str1.length + 5.0);
+      
+      str1 = "light': ";
+      light1 = data.substring(data.search(str1) + str1.length, data.search(str1) + str1.length + 5.0);
+      
+      str1 = "humidity': ";
+      humidity1 = data.substring(data.search(str1) + str1.length, data.search(str1) + str1.length + 5.0);
+      
+      str1 = "atmo_pressure': ";
+      atmo1 = data.substring(data.search(str1) + str1.length, data.search(str1) + str1.length + 5.0);
+      
+      str1 = "wind': ";
+      wind1 = data.substring(data.search(str1) + str1.length, data.search(str1) + str1.length + 5.0);
+      
+      str1 = "timestamp': ";
+      timestamp = data.substring(data.search(str1) + str1.length, data.search(str1) + str1.length + 5.0);
+
+      document.getElementById("temp").innerHTML = "<p>" + temp1 +"</p>";
+      document.getElementById("humidity").innerHTML = "<p>" + humidity1  + "</p>";
+      document.getElementById("light").innerHTML = "<p>" + light1 +  "</p>";
+      document.getElementById("wind").innerHTML = "<p>" + wind1 +  "</p>";
+      document.getElementById("atm-pressure").innerHTML = "<p>" +atmo1 + "</p>";
+      document.getElementById("timestamp").innerHTML = "<p>" + timestamp  + "</p>";
+    }
+
+
+		var images = {
+			"BLIZZARD": "{{ url_for('static', filename='img/weather/blizzard.jpg')}}",
+			"CLOUDY": "{{ url_for('static', filename='img/weather/cloudy.gif')}}",
+			"CONVECTION_OVEN": "{{ url_for('static', filename='img/weather/convection_oven.gif')}}",
+			"HOT": "{{ url_for('static', filename='img/weather/hot_weather.gif')}}",
+			"MONSOON": "{{ url_for('static', filename='img/weather/monsoon.gif')}}",
+			"SLIGHT_BREEZE": "{{ url_for('static', filename='img/weather/slight_breeze.gif')}}",
+			"HEAVY_RAIN": "{{ url_for('static', filename='img/weather/heavy_rain.gif')}}",
+			"SLIGHT_RAIN": "{{ url_for('static', filename='img/weather/slight_rain.gif')}}",
+			"SNOW": "{{ url_for('static', filename='img/weather/snow.gif')}}",
+			"WET_SNOW": "{{ url_for('static', filename='img/weather/wet_snow.png')}}",
+			"WARM":  "{{ url_for('static', filename='img/weather/sun.gif')}}",
+			"JUST_A_NORMAL_DAY":  "{{ url_for('static', filename='img/weather/just_a_normal_day.gif')}}"
+		};
+
+
+		// function updateImageByPrediction(msg_prediction) {
+		function updateImageByPrediction(prediction) {
+			str1 = "PREDICTED_WEATHER_FINAL:";
+			console.log("PREDICTION:" + prediction);
+			document.getElementById("prediction-img").src = images[prediction];
+			document.getElementById("prediction-img").alt = "prediction: " + prediction;
+		}
+
+// Example data:
+// DATA:{'temperature_sensor_1': 37.50007411204504, 'temperature_sensor_2': 37.93698542411816, 'humidity_sensor_1': 3.391986182278761, 'humidity_sensor_2': 77.30193685569708, 'wind_speed_sensor_1': 39.207535688033616, 'wind_speed_sensor_2': 6.508800798411962, 'atmo_pressure_sensor_1': 654.988654809006, 'atmo_pressure_sensor_2': 736.0517462030361, 'light_sensor_1': 176.0, 'light_sensor_2': 125.0, 'unix_timestamp_us': 1584557664076949}
+</script>
+</body>
+
+</html>
