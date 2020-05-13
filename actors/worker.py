@@ -17,7 +17,9 @@ class Worker(Actor):
 
         try:
             if(message=="PANIC"):
-                raise Exception('PANIC')
+                # TODO
+                pass
+                # raise Exception('PANIC')
             else:
                 self.get_printer_actor().inbox.put({"text":"I %s was told to process '%s' [%d]" %(self.name, message, self.inbox.qsize()), "type":"blue"})
 
@@ -70,11 +72,12 @@ class Worker(Actor):
         worker_to_be_restarted.start()
 
        
+        directory.remove_actor(self)
         directory.add_actor(name, worker_to_be_restarted)
+        worker_to_be_restarted.subscribe("worker-data-topic-" + worker_to_be_restarted.route, worker_to_be_restarted.name)
 
         self.stop()
 
-        worker_to_be_restarted.subscribe("worker-data-topic-" + worker_to_be_restarted.route, worker_to_be_restarted.name)
 
         return worker_to_be_restarted
 
