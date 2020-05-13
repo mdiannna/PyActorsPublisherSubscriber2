@@ -8,10 +8,11 @@ import os
 from flask import request
 
 class WebActor(Actor):
-    def __init__(self, name="WebActor"):
+    def __init__(self, message_broker, name="WebActor"):
         super().__init__()
         self.name = name
         self.state = States.Idle
+        self.message_broker = message_broker
         self.url = os.getenv("SEND_URL")
         print("WebActor init")
 

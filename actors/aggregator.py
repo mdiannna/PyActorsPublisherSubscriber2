@@ -4,16 +4,16 @@ import gevent
 import time
 import copy
 from .helpers import most_frequent
-
+from .mydirectory import directory
 
 class Aggregator(Actor):
-    def __init__(self, name, directory):
+    def __init__(self, name, message_broker):
         Actor.__init__(self)
         self.name = name
         self.state = States.Idle
-        self.directory = directory
-        self.printer_actor = PrinterActor("Aggregator_printer")
+        self.printer_actor = PrinterActor("Aggregator_printer", message_broker)
         self.printer_actor.start()
+        self.message_broker = message_broker
         self.last_time = time.time()
         self.current_time = time.time()
 
@@ -60,10 +60,10 @@ class Aggregator(Actor):
 
     
     def get_printer_actor(self):
-        return self.directory.get_actor('printeractor')
+        return directory.get_actor('printeractor')
 
     def get_web_actor(self):
-        return self.directory.get_actor('webactor')
+        return directory.get_actor('webactor')
         
 
     def print_result(self, text):

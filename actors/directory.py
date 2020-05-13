@@ -1,4 +1,4 @@
-from .supervisorrestartpolicy import SupervisorRestartPolicy
+# from .supervisorrestartpolicy import SupervisorRestartPolicy
 # from .requestorrestartpolicy import RequestorRestartPolicy
 import gevent
 from gevent.queue import Queue
@@ -9,7 +9,7 @@ from gevent import Greenlet
 class Directory:
     def __init__(self):
         self.actors = {}
-        self.supervisor_restart_policy = SupervisorRestartPolicy()
+        # self.supervisor_restart_policy = SupervisorRestartPolicy()
         # self.requestor_restart_policy = RequestorRestartPolicy()
 
     def add_actor(self, name, actor):

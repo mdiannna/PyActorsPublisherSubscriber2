@@ -2,13 +2,15 @@ from .actors import Actor, States, Work
 from . import weather
 import gevent 
 import json
+from .mydirectory import directory
 
 class Worker(Actor):
-    def __init__(self, name, directory):
+    def __init__(self, name, message_broker):
         super().__init__()
         self.name = name
         self.state = States.Idle
-        self.directory = directory
+        
+        self.message_broker = message_broker
 
     def receive(self, message):
         self.state = States.Running
@@ -43,17 +45,17 @@ class Worker(Actor):
 
 
     def get_printer_actor(self):
-        return self.directory.get_actor('printeractor')
+        return directory.get_actor('printeractor')
 
     def get_web_actor(self):
-        return self.directory.get_actor('webactor')
+        return directory.get_actor('webactor')
     
     def get_aggregator_actor(self):
-        return self.directory.get_actor('aggregator')
+        return directory.get_actor('aggregator')
 
     def get_supervisor_actor(self):
-        return self.directory.get_actor('supervisor')
+        return directory.get_actor('supervisor')
         
     def get_directory(self):
-        return self.directory
+        return directory
 

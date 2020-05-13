@@ -2,11 +2,11 @@ from .actors import Actor, States, Work
 from .worker import Worker
 from gevent.queue import Queue
 from .workerrestartpolicy import WorkerRestartPolicy
-
+from .mydirectory import directory
 
 class WorkerSupervisor(Actor):
 
-    def __init__(self, name, directory, workers_array=[]):
+    def __init__(self, name, message_broker, workers_array=[]):
         super().__init__()
         self.name = name
         self.state = States.Idle
@@ -14,8 +14,8 @@ class WorkerSupervisor(Actor):
         self.workers = Queue(maxsize=self.max_work_capacity)
         self.workers_cnt_id = 0
         self.worker_restart_policy = WorkerRestartPolicy()
+        self.message_broker = message_broker
     
-        self.directory = directory
 
         if len(workers_array)>0:
             for worker_name in workers_array:
@@ -25,19 +25,21 @@ class WorkerSupervisor(Actor):
 
 
     def get_printer_actor(self):
-        return self.directory.get_actor('printeractor')
+        return directory.get_actor('printeractor')
 
     def add_worker(self):
         self.workers_cnt_id += 1
-        new_worker = Worker("worker%d" % self.workers_cnt_id, self.directory)
+        new_worker = Worker("worker%d" % self.workers_cnt_id, self.message_broker)
         self.get_printer_actor().inbox.put({"text":"ADD WORKER %d" % self.workers_cnt_id, "type":'warning'})
         new_worker.start()
         self.workers.put(new_worker)
+        directory.add_actor(new_worker.name, new_worker)
 
 
     def add_named_worker(self, name):
         self.workers_cnt_id += 1
-        new_worker = Worker(name, self.directory)
+        new_worker = Worker(name, self.message_broker)
+        directory.add_actor(new_worker.name, new_worker)
         self.get_printer_actor().inbox.put({"text":"ADD NAMED WORKER %s" % name, "type":'warning'})
 
         new_worker.start()
@@ -49,7 +51,7 @@ class WorkerSupervisor(Actor):
         worker.stop()
         
     def get_directory(self):
-        return self.directory
+        return directory
 
     def start(self):
         Actor.start(self)       
@@ -101,7 +103,7 @@ class WorkerSupervisor(Actor):
      
 
     def get_directory(self):
-        return self.directory
+        return directory
 
     def add_first_actors(self):
         self.add_worker()    
@@ -163,7 +165,8 @@ class WorkerSupervisor(Actor):
             worker_name = message[start:]
             # for debug
             # print("WORKER_NAME" + worker_name)
-            current_worker = self.get_worker_name(worker_name)
+            # current_worker = self.get_worker_name(worker_name)
+            current_worker = directory.get_actor(worker_name)
             self.process_worker_fail(current_worker)
             
         # send work to calculate to worker
@@ -174,3 +177,13 @@ class WorkerSupervisor(Actor):
             self.workers.put(current_worker)
 
         self.adapt_number_of_workers()
+
+    def get_message_broker(self):
+        return self.message_broker
+    
+
+    def publish(self, topic, message):
+        self.get_message_broker().inbox.put('{"publish":"' +topic + '":"' + message + '"}')
+
+    def subscribe(self, topic):
+        self.get_message_broker().inbox.put('{"subscribe":"' + self.name + '":"' + topic + '"}')        

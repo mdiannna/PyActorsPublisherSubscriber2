@@ -3,10 +3,11 @@ from . import prettyprint
 import pprint
 
 class PrinterActor(Actor):
-    def __init__(self, name):
+    def __init__(self, name, message_broker):
         super().__init__()
         self.name = name
         self.state = States.Idle
+        self.message_broker = message_broker
 
     def start(self):
         Actor.start(self)

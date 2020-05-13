@@ -18,11 +18,10 @@ class SupervisorRestartPolicy():
             workers_children.append(new_worker)
 
         supervisor_name = supervisor.get_name()
-        directory = supervisor.get_directory()
         supervisor.stop()
 
 
-        new_supervisor = WorkerSupervisor(supervisor_name, directory, workers_array=workers_children)
+        new_supervisor = WorkerSupervisor(supervisor_name, workers_array=workers_children)
         new_supervisor.start()
         return new_supervisor
 

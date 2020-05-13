@@ -1,17 +1,18 @@
 # channel=topic
 from .actors import Actor, States
+from .mydirectory import directory
 
 class MessageBroker(Actor):
-    def __init__(self, name, directory):
+    def __init__(self, name):
         super().__init__()
         self.name = name
         self.state = States.Idle
-        self.directory = directory
 
         # self.topicsActors = {"":[]}
         self.topicsActors = {}
 
     def subscribe(self, actorname, topic):
+        print("***subscribe***")
         if not topic in self.topicsActors:
             self.topicsActors[topic] = []
 
@@ -25,12 +26,13 @@ class MessageBroker(Actor):
 
     # TODO: test
     def publish(self, topic, message):
+        print("***Publish message***")
         # Find all actors subscribed to topic
         # actor.inbox.put()
         actorSubscribedTopic = self.topicsActors[topic]
 
         for actorname in actorSubscribedTopic:
-            directory.get(actorname).inbox.put(message)
+            directory.get_actor(actorname).inbox.put(message)
 
     def separateCommands(self, message):
         separatorIndex1 = message.find('":"')
@@ -45,8 +47,10 @@ class MessageBroker(Actor):
     # {"subscribe":"actorname":"topic"} 
     # {"unsubscribe":"actorname":"topic"}   
     # {"publish":"topic":"message"} 
-    def receive(self, messagae):
+    def receive(self, message):
         self.state = States.Running
+        print("RECEIVE!!!!!!******")
+        print(message)
 
         isValid = True
 

@@ -2,7 +2,7 @@ from .actors import Actor, States, Work
 from .mysseclient import with_urllib3
 from .mysseclient import with_urllib3
 import requests
-from .directory import Directory
+from .mydirectory import directory
 from .webactor import WebActor
 from gevent.queue import Queue
 from enum import Enum
@@ -15,10 +15,10 @@ import os
 
 
 class Requestor(Actor):
-    def __init__(self, name, directory):
+    def __init__(self, name, message_broker):
         super().__init__()
-        self.directory = directory
         self.name = name
+        self.message_broker = message_broker
         self.state = States.Idle        
 
         gevent.sleep(4)
@@ -43,9 +43,9 @@ class Requestor(Actor):
         messages = sseclient.SSEClient(self.url)
         for event in messages:
 
-            print("##############")
-            print(event)
-            print(str(event))
+            # print("##############")
+            # print(event)
+            # print(str(event))
 
             mymessage = str(event)
             # if(event):
@@ -58,17 +58,24 @@ class Requestor(Actor):
             gevent.sleep(1)
 
             self.get_printer_actor().inbox.put({"text":"...Requesting work...", "type":"warning"})
+            print("MESSAGE BROKER:")
+            print(self.message_broker.name)
+            print(self.message_broker.state)
 
             if(mymessage=='{"message": panic}'):
               self.get_printer_actor().inbox.put({"text":" PANIC  ", "type":"error"})
-              self.supervisor.inbox.put('PANIC')
-            else:
+              # self.supervisor.inbox.put('PANIC')
+              self.publish("send-data-iot", "PANIC")
+              self.message_broker.inbox.put("HELLO!")
+            elif(mymessage):
                 self.get_printer_actor().inbox.put({"text":mymessage, "type":"pprint"})
                 # sensors_data = json.loads(event)
                 sensors_data = mymessage
 
                 self.last_sensors_data = sensors_data
-                self.supervisor.inbox.put(sensors_data)
+                # self.supervisor.inbox.put(sensors_data)
+                self.publish("send-data-iot", sensors_data)
+
         
             # self.get_printer_actor().inbox.put({"text":"----", "type":"blue"})
 
@@ -76,7 +83,8 @@ class Requestor(Actor):
     def receive(self, message):
         if message == "start":
             self.get_printer_actor().inbox.put({"text":"Requestor starting...", "type":"header"})
-            self.supervisor = self.directory.get_actor('supervisor')
+            self.supervisor = directory.get_actor('supervisor')
+            self.supervisor.subscribe("send-data-iot")
             gevent.spawn(self.loop)
 
 
@@ -84,7 +92,20 @@ class Requestor(Actor):
         return self.supervisor
 
     def get_printer_actor(self):
-        return self.directory.get_actor('printeractor')
+        return directory.get_actor('printeractor')
         
     def get_directory(self):
-        return self.directory
+        return directory
+
+
+    def get_message_broker(self):
+        return self.message_broker
+
+    def publish(self, topic, message):
+        print("PUBLISH!" + topic + "   " + message)
+        # self.get_message_broker().inbox.put('{"publish":"' +topic + '":"' + message + '"}')
+        self.message_broker.inbox.put('{"publish":"' +topic + '":"' + message + '"}')
+
+    def subscribe(self, topic):
+        self.message_broker.inbox.put('{"subscribe":"' + self.name + '":"' + topic + '"}')        
+
