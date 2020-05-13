@@ -49,8 +49,8 @@ class MessageBroker(Actor):
     # {"publish":"topic":"message"} 
     def receive(self, message):
         self.state = States.Running
-        print("RECEIVE!!!!!!******")
-        print(message)
+        # print("RECEIVE!!!!!!******")
+        # print(message)
 
         isValid = True
 

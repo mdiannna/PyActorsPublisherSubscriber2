@@ -15,7 +15,7 @@ import os
 
 
 class Requestor(Actor):
-    def __init__(self, name, message_broker):
+    def __init__(self, name, message_broker, route):
         super().__init__()
         self.name = name
         self.message_broker = message_broker
@@ -23,7 +23,8 @@ class Requestor(Actor):
 
         gevent.sleep(4)
    
-        self.url = os.getenv('EVENTS_SERVER_URL') + '/sensors'
+        # self.url = os.getenv('EVENTS_SERVER_URL') + '/sensors'
+        self.url = os.getenv('EVENTS_SERVER_URL') + route
         try:
             self.response = with_urllib3(self.url)
             print("OK")
@@ -58,10 +59,7 @@ class Requestor(Actor):
             gevent.sleep(1)
 
             self.get_printer_actor().inbox.put({"text":"...Requesting work...", "type":"warning"})
-            print("MESSAGE BROKER:")
-            print(self.message_broker.name)
-            print(self.message_broker.state)
-
+            
             if(mymessage=='{"message": panic}'):
               self.get_printer_actor().inbox.put({"text":" PANIC  ", "type":"error"})
               # self.supervisor.inbox.put('PANIC')
@@ -102,8 +100,6 @@ class Requestor(Actor):
         return self.message_broker
 
     def publish(self, topic, message):
-        print("PUBLISH!" + topic + "   " + message)
-        # self.get_message_broker().inbox.put('{"publish":"' +topic + '":"' + message + '"}')
         self.message_broker.inbox.put('{"publish":"' +topic + '":"' + message + '"}')
 
     def subscribe(self, topic):

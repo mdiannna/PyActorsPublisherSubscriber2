@@ -49,6 +49,7 @@ class WorkerSupervisor(Actor):
         worker = self.workers.get()
         self.get_printer_actor().inbox.put({"text":"REMOVE WORKER %s" % worker.get_name(), "type":'warning'})
         worker.stop()
+        directory.remove_actor(worker)
         
     def get_directory(self):
         return directory
