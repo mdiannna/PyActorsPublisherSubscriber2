@@ -71,7 +71,7 @@ class Worker(Actor):
 
         msg_broker = self.message_broker
 
-        self.unsubscribe("worker-data-topic-" + self.route, self.name)
+        # self.unsubscribe("worker-data-topic-" + self.route, self.name)
         
         worker_to_be_restarted = Worker(name, msg_broker, self.route)
         worker_to_be_restarted.start()
@@ -79,7 +79,7 @@ class Worker(Actor):
        
         directory.remove_actor(self)
         directory.add_actor(name, worker_to_be_restarted)
-        worker_to_be_restarted.subscribe("worker-data-topic-" + worker_to_be_restarted.route, worker_to_be_restarted.name)
+        # worker_to_be_restarted.subscribe("worker-data-topic-" + worker_to_be_restarted.route, worker_to_be_restarted.name)
 
         self.stop()
 

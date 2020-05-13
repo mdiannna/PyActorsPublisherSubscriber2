@@ -77,9 +77,14 @@ class WorkerSupervisor(Actor):
         # worker_to_be_restarted = directory.restart_worker(current_worker)
 
         name = current_worker.get_name()
+        current_worker.unsubscribe("worker-data-topic-" + current_worker.route, current_worker.name)
+
         self.publish("print-topic", str({"text":"--killed worker %s" % name, "type":'warning'}))
         self.workers.put(worker_to_be_restarted)
         self.publish("print-topic", str({"text":"--restarted worker %s" %worker_to_be_restarted.get_name(), "type":'warning'}))
+
+        worker_to_be_restarted.subscribe("worker-data-topic-" + worker_to_be_restarted.route, worker_to_be_restarted.name)
+
 
      
     def adapt_number_of_workers(self):
