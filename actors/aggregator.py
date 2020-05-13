@@ -40,7 +40,9 @@ class Aggregator(Actor):
             if(len(self.predictions)>0):
                 predicted_weather = self.aggregate_all_predictions(copy.copy(self.predictions))
 
-                self.get_printer_actor().inbox.put({"text":"PREDICTED_WEATHER_FINAL:" + predicted_weather, "type":"green_header"})
+                # self.get_printer_actor().inbox.put({"text":"PREDICTED_WEATHER_FINAL:" + predicted_weather, "type":"green_header"})
+                self.publish("print-topic", str({"text":"PREDICTED_WEATHER_FINAL:" + predicted_weather, "type":"green_header"}))
+
                 self.get_web_actor().inbox.put("PREDICTED_WEATHER_FINAL:" + predicted_weather)
 
             self.reinit()
@@ -67,7 +69,9 @@ class Aggregator(Actor):
         
 
     def print_result(self, text):
-        self.self.get_printer_actor().inbox.put({"text":text, "type":"green_header"})
+        # self.self.get_printer_actor().inbox.put({"text":text, "type":"green_header"})
+        self.publish("print-topic", str({"text":text, "type":"green_header"}))
+        
 
 
     def set_delay_time(self, new_delay_time):
@@ -76,3 +80,18 @@ class Aggregator(Actor):
 
     def get_delay_time(self):
         return self.DELAY_TIME
+
+    def get_message_broker(self):
+        return self.message_broker
+    
+
+    def publish(self, topic, message):
+        self.get_message_broker().inbox.put('{"publish":"' +topic + '":"' + message + '"}')
+
+    def subscribe(self, topic, name):
+        self.get_message_broker().inbox.put('{"subscribe":"' + name + '":"' + topic + '"}')        
+
+    def unsubscribe(self, topic, name):
+        self.get_message_broker().inbox.put('{"unsubscribe":"' + name + '":"' + topic + '"}')        
+
+

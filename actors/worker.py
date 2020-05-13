@@ -21,7 +21,8 @@ class Worker(Actor):
                 pass
                 # raise Exception('PANIC')
             else:
-                self.get_printer_actor().inbox.put({"text":"I %s was told to process '%s' [%d]" %(self.name, message, self.inbox.qsize()), "type":"blue"})
+                self.publish("print-topic", str({"text":"I %s was told to process '%s' [%d]" %(self.name, message, self.inbox.qsize()), "type":"blue"}))
+                # self.get_printer_actor().inbox.put({"text":"I %s was told to process '%s' [%d]" %(self.name, message, self.inbox.qsize()), "type":"blue"})
 
                 athm_pressure, humidity, light, temperature, wind_speed, timestamp = weather.aggregate_sensor_values(message)
                 predicted_weather = weather.predict_weather(athm_pressure, humidity, light, temperature, wind_speed)
@@ -39,7 +40,9 @@ class Worker(Actor):
                 self.get_web_actor().inbox.put("DATA:" +str(json.dumps(str(sensor_data_web))))
 
                 self.get_aggregator_actor().inbox.put("PREDICTED_WEATHER:" + predicted_weather)
-                self.get_printer_actor().inbox.put({"text":"PREDICTED_WEATHER:" + predicted_weather, "type":"header"})
+                # self.get_printer_actor().inbox.put({"text":"PREDICTED_WEATHER:" + predicted_weather, "type":"header"})
+                self.publish("print-topic", str({"text":"PREDICTED_WEATHER:" + predicted_weather, "type":"header"}))
+            
 
                 self.state = States.Idle
         except:

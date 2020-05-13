@@ -69,7 +69,8 @@ class WorkerSupervisor(Actor):
         # print("PANIC")
         self.publish("print-topic", str({"text":"!!! PANIC !!!", "type":'warning-bold'}))
         # TODO!!!!! publish
-        current_worker.inbox.put("PANIC")
+        # current_worker.inbox.put("PANIC")
+        self.publish("worker-data-topic-"+self.route,"PANIC")
 
     def process_worker_fail(self, current_worker):
         worker_to_be_restarted = current_worker.restart()

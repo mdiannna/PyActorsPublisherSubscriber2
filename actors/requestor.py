@@ -59,15 +59,17 @@ class Requestor(Actor):
             # # print(event)
             gevent.sleep(0.5)
 
-            self.get_printer_actor().inbox.put({"text":"...Requesting work...", "type":"warning"})
+            # self.get_printer_actor().inbox.put({"text":"...Requesting work...", "type":"warning"})
+            self.publish("print-topic", str({"text":"...Requesting work...", "type":"warning"}))
             
             if(mymessage=='{"message": panic}'):
               self.get_printer_actor().inbox.put({"text":" PANIC  ", "type":"error"})
               # self.supervisor.inbox.put('PANIC')
               self.publish("send-data-iot", "PANIC")
-              self.message_broker.inbox.put("HELLO!")
             elif(mymessage):
-                self.get_printer_actor().inbox.put({"text":mymessage, "type":"pprint"})
+                # self.get_printer_actor().inbox.put({"text":mymessage, "type":"pprint"})
+                self.publish("print-topic", str({"text":mymessage, "type":"pprint"}))
+
                 # sensors_data = json.loads(event)
                 sensors_data = mymessage
 
@@ -81,7 +83,9 @@ class Requestor(Actor):
 
     def receive(self, message):
         if message == "start":
-            self.get_printer_actor().inbox.put({"text":"Requestor starting...", "type":"header"})
+            # self.get_printer_actor().inbox.put({"text":"Requestor starting...", "type":"header"})
+            self.publish("print-topic", str({"text":"Requestor starting...", "type":"header"}))
+
             self.supervisor = directory.get_actor('supervisor')
             self.subscribe("send-data-iot", self.supervisor.name)
             gevent.spawn(self.loop)
