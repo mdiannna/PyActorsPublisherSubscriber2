@@ -8,11 +8,14 @@ class PrinterActor(Actor):
         self.name = name
         self.state = States.Idle
         self.message_broker = message_broker
+        self.subscribe("print-topic", self.name)
 
     def start(self):
         Actor.start(self)
 
     def receive(self, message):
+        if(isinstance(message, str) ):
+            message = eval(message)
         # message["text"]
         # message["type"]
         if message["type"]=="warning":
@@ -35,3 +38,16 @@ class PrinterActor(Actor):
             print("!!!")
             pprint.pprint(message["text"])
             # pprint.pprint(message["text"]["message"])
+
+    def get_message_broker(self):
+        return self.message_broker
+
+    def publish(self, topic, message):
+        self.get_message_broker().inbox.put('{"publish":"' +topic + '":"' + message + '"}')
+
+    def subscribe(self, topic, name):
+        self.get_message_broker().inbox.put('{"subscribe":"' + name + '":"' + topic + '"}')        
+
+    def unsubscribe(self, topic, name):
+        self.get_message_broker().inbox.put('{"unsubscribe":"' + name + '":"' + topic + '"}')        
+

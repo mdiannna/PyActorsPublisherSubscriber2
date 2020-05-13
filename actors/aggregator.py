@@ -11,8 +11,8 @@ class Aggregator(Actor):
         Actor.__init__(self)
         self.name = name
         self.state = States.Idle
-        self.printer_actor = PrinterActor("Aggregator_printer", message_broker)
-        self.printer_actor.start()
+        self.printer_actor = directory.get_actor("printeractor")
+        # self.printer_actor.start()
         self.message_broker = message_broker
         self.last_time = time.time()
         self.current_time = time.time()

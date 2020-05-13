@@ -31,7 +31,9 @@ class WorkerSupervisor(Actor):
     def add_worker(self):
         self.workers_cnt_id += 1
         new_worker = Worker("worker%d" % self.workers_cnt_id, self.message_broker)
-        self.get_printer_actor().inbox.put({"text":"ADD WORKER %d" % self.workers_cnt_id, "type":'warning'})
+        # self.get_printer_actor().inbox.put({"text":"ADD WORKER %d" % self.workers_cnt_id, "type":'warning'})
+        self.publish("print-topic", str({"text":"ADD WORKER %d" % self.workers_cnt_id, "type":'warning'}))
+
         new_worker.start()
         self.workers.put(new_worker)
         directory.add_actor(new_worker.name, new_worker)
@@ -42,7 +44,8 @@ class WorkerSupervisor(Actor):
         self.workers_cnt_id += 1
         new_worker = Worker(name, self.message_broker)
         directory.add_actor(new_worker.name, new_worker)
-        self.get_printer_actor().inbox.put({"text":"ADD NAMED WORKER %s" % name, "type":'warning'})
+        # self.get_printer_actor().inbox.put({"text":"ADD NAMED WORKER %s" % name, "type":'warning'})
+        self.publish("print-topic", str({"text":"ADD NAMED WORKER %s" % name, "type":'warning'}))
 
         new_worker.start()
         self.workers.put(new_worker)
@@ -51,7 +54,7 @@ class WorkerSupervisor(Actor):
 
     def remove_worker(self):
         worker = self.workers.get()
-        self.get_printer_actor().inbox.put({"text":"REMOVE WORKER %s" % worker.get_name(), "type":'warning'})
+        self.publish("print-topic", str({"text":"REMOVE WORKER %s" % worker.get_name(), "type":'warning'}))
         self.unsubscribe("worker-data-topic-" + self.route, worker.name)
         worker.stop()
         directory.remove_actor(worker)
@@ -64,16 +67,16 @@ class WorkerSupervisor(Actor):
 
     def process_panic_message(self, current_worker):
         # print("PANIC")
-        self.get_printer_actor().inbox.put({"text":"!!! PANIC !!!", "type":'warning-bold'})
+        self.publish("print-topic", str({"text":"!!! PANIC !!!", "type":'warning-bold'}))
         current_worker.inbox.put("PANIC")
 
     def process_worker_fail(self, current_worker):
         worker_to_be_restarted = self.worker_restart_policy.restart_worker(current_worker)
 
         name = current_worker.get_name()
-        self.get_printer_actor().inbox.put({"text":"--killed worker %s" % name, "type":'warning'})
+        self.publish("print-topic", str({"text":"--killed worker %s" % name, "type":'warning'}))
         self.workers.put(worker_to_be_restarted)
-        self.get_printer_actor().inbox.put({"text":"--restarted worker %s" %worker_to_be_restarted.get_name(), "type":'warning'})
+        self.publish("print-topic", str({"text":"--restarted worker %s" %worker_to_be_restarted.get_name(), "type":'warning'}))
 
      
     def adapt_number_of_workers(self):
@@ -138,23 +141,23 @@ class WorkerSupervisor(Actor):
             self.add_first_actors()
             return
         
-        self.get_printer_actor().inbox.put({"text":'Receives work', "type":'normal'})       
+        self.publish("print-topic", str({"text":'Receives work', "type":'normal'}))
         self.demandWorkQueue.put(message)
 
-        self.get_printer_actor().inbox.put({"text": str("Demand work: %d" %self.demandWorkQueue.qsize()), "type":'green'})
+        self.publish("print-topic", str({"text": str("Demand work: %d" %self.demandWorkQueue.qsize()), "type":'green'}))
 
         if -1 == self.workers.qsize() - 1 or self.workers.empty():
-            self.get_printer_actor().inbox.put({"text":"Supervisor received work but no workers to give it to!",
-                "type":"error"})
+            self.publish("print-topic", str({"text":"Supervisor received work but no workers to give it to!",
+                "type":"error"}))
             if self.workers.qsize() < self.max_work_capacity:
-                self.get_printer_actor().inbox.put({"text":"Adding new worker", "type":"warning"})
+                self.publish("print-topic", str({"text":"Adding new worker", "type":"warning"}))
                 self.add_worker()
             else:
-                self.get_printer_actor().inbox.put({"text":"Max work Capacity exceeded!!! waiting for free worker", "type":"error"})
+                self.publish("print-topic", str({"text":"Max work Capacity exceeded!!! waiting for free worker", "type":"error"}))
                 return
         
         if self.workers.empty():
-            self.get_printer_actor().inbox.put({"text":"No active worker. Adding new worker", "type":"warning"})
+            self.publish("print-topic", str({"text":"No active worker. Adding new worker", "type":"warning"}))
             self.add_worker()
 
         message = self.demandWorkQueue.get()
@@ -178,7 +181,7 @@ class WorkerSupervisor(Actor):
         # send work to calculate to worker
         else:
             current_worker = self.workers.get()
-            self.get_printer_actor().inbox.put({"text":"Sending work to worker %s [%d]" % (current_worker.name, self.inbox.qsize()), "type":"warning"})
+            self.publish("print-topic", str({"text":"Sending work to worker %s [%d]" % (current_worker.name, self.inbox.qsize()), "type":"warning"}))
             
             # self.publish("worker-data-topic-" + self.route, message)
             current_worker.inbox.put(message)
