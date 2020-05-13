@@ -20,7 +20,8 @@ class MessageBroker(Actor):
     
     def unsubscribe(self, actorname, topic):
         if topic in self.topicsActors:
-            self.topicsActors[topic].remove(actorname)
+            if(actorname in self.topicsActors[topic]):
+                self.topicsActors[topic].remove(actorname)
         # TODO?????
         # actorname.inbox.put("You unsubscribed from topic")
 
@@ -77,7 +78,7 @@ class MessageBroker(Actor):
             self.unsubscribe(actorname, topic)
 
         else:
-            isValid = false
+            isValid = False
             # MESSAGE NOT VALID
 
             

@@ -6,7 +6,7 @@ from .mydirectory import directory
 
 class WorkerSupervisor(Actor):
 
-    def __init__(self, name, message_broker, workers_array=[]):
+    def __init__(self, name, message_broker, route, workers_array=[]):
         super().__init__()
         self.name = name
         self.state = States.Idle
@@ -15,6 +15,7 @@ class WorkerSupervisor(Actor):
         self.workers_cnt_id = 0
         self.worker_restart_policy = WorkerRestartPolicy()
         self.message_broker = message_broker
+        self.route = route
     
 
         if len(workers_array)>0:
@@ -34,6 +35,7 @@ class WorkerSupervisor(Actor):
         new_worker.start()
         self.workers.put(new_worker)
         directory.add_actor(new_worker.name, new_worker)
+        self.subscribe("worker-data-topic-" + self.route, new_worker.name)
 
 
     def add_named_worker(self, name):
@@ -44,13 +46,16 @@ class WorkerSupervisor(Actor):
 
         new_worker.start()
         self.workers.put(new_worker)
+        self.subscribe("worker-data-topic-" + self.route, new_worker.name)
+
 
     def remove_worker(self):
         worker = self.workers.get()
         self.get_printer_actor().inbox.put({"text":"REMOVE WORKER %s" % worker.get_name(), "type":'warning'})
+        self.unsubscribe("worker-data-topic-" + self.route, worker.name)
         worker.stop()
         directory.remove_actor(worker)
-        
+
     def get_directory(self):
         return directory
 
@@ -174,8 +179,11 @@ class WorkerSupervisor(Actor):
         else:
             current_worker = self.workers.get()
             self.get_printer_actor().inbox.put({"text":"Sending work to worker %s [%d]" % (current_worker.name, self.inbox.qsize()), "type":"warning"})
+            
+            # self.publish("worker-data-topic-" + self.route, message)
             current_worker.inbox.put(message)
             self.workers.put(current_worker)
+
 
         self.adapt_number_of_workers()
 
@@ -186,5 +194,8 @@ class WorkerSupervisor(Actor):
     def publish(self, topic, message):
         self.get_message_broker().inbox.put('{"publish":"' +topic + '":"' + message + '"}')
 
-    def subscribe(self, topic):
-        self.get_message_broker().inbox.put('{"subscribe":"' + self.name + '":"' + topic + '"}')        
+    def subscribe(self, topic, name):
+        self.get_message_broker().inbox.put('{"subscribe":"' + name + '":"' + topic + '"}')        
+
+    def unsubscribe(self, topic, name):
+        self.get_message_broker().inbox.put('{"unsubscribe":"' + name + '":"' + topic + '"}')        

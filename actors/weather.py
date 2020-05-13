@@ -1,5 +1,5 @@
 
-def aggregate_sensor_values(data):
+def aggregate_sensor_values_all(data):
 	athm_pressure = (data["atmo_pressure_sensor_1"] + data["atmo_pressure_sensor_2"]) / 2.0
 	humidity = (data["humidity_sensor_1"] + data["humidity_sensor_2"]) / 2.0
 	light = (data["light_sensor_1"] + data["light_sensor_2"]) / 2.0
@@ -8,6 +8,38 @@ def aggregate_sensor_values(data):
 	timestamp = data["unix_timestamp_us"]
 
 	return athm_pressure, humidity, light, temperature, wind_speed, timestamp
+
+
+def aggregate_sensor_values_iot(data):
+	athm_pressure = (data["atmo_pressure_sensor_1"] + data["atmo_pressure_sensor_2"]) / 2.0
+	# humidity = (data["humidity_sensor_1"] + data["humidity_sensor_2"]) / 2.0
+	# light = (data["light_sensor_1"] + data["light_sensor_2"]) / 2.0
+	# temperature = (data["temperature_sensor_1"] + data["temperature_sensor_2"]) / 2.0
+	wind_speed = (data["wind_speed_sensor_1"] + data["wind_speed_sensor_2"]) / 2.0
+	timestamp = data["unix_timestamp_100us"]
+
+	return  wind_speed, athm_pressure, timestamp
+
+def aggregate_sensor_values_sensors(data):
+	light = (data["light_sensor_1"] + data["light_sensor_2"]) / 2.0
+	timestamp = data["unix_timestamp_100us"]
+
+	return light, timestamp
+
+# TODO:
+# This will be xml!
+# def aggregate_sensor_values_legacy_sensors(data):
+# 	athm_pressure = (data["atmo_pressure_sensor_1"] + data["atmo_pressure_sensor_2"]) / 2.0
+# 	humidity = (data["humidity_sensor_1"] + data["humidity_sensor_2"]) / 2.0
+# 	light = (data["light_sensor_1"] + data["light_sensor_2"]) / 2.0
+# 	temperature = (data["temperature_sensor_1"] + data["temperature_sensor_2"]) / 2.0
+# 	wind_speed = (data["wind_speed_sensor_1"] + data["wind_speed_sensor_2"]) / 2.0
+# 	timestamp = data["unix_timestamp_us"]
+
+# 	return athm_pressure, humidity, light, temperature, wind_speed, timestamp
+
+
+
 
 def predict_weather(athm_pressure, humidity, light, temperature, wind_speed):
 	if (temperature < -2 and light < 128) and athm_pressure < 720:

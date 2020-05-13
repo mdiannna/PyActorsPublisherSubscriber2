@@ -27,11 +27,14 @@ class Pool(Actor):
 
         self.printer_actor = PrinterActor('printeractor', self.message_broker)
         self.web_actor = WebActor('webactor', self.message_broker)
-        self.requestor = Requestor('requestor', self.message_broker, '/iot')
-        # self.requestor = Requestor('requestor', self.message_broker, '/sensors')
-        # self.requestor = Requestor('requestor', self.message_broker, '/legacy_sensors')
-        
-        self.supervisor = WorkerSupervisor("supervisor", self.message_broker)
+        self.requestor = Requestor('requestor', self.message_broker, 'iot')
+        # self.requestor = Requestor('requestor2', self.message_broker, 'sensors')
+        # self.requestor = Requestor('requestor3', self.message_broker, 'legacy_sensors')
+
+        self.supervisor = WorkerSupervisor("supervisor", self.message_broker, 'iot')
+        # self.supervisor = WorkerSupervisor("supervisor2", self.message_broker, 'sensors')
+        # self.supervisor = WorkerSupervisor("supervisor3", self.message_broker,  'legacy_sensors')
+
         self.aggregator = Aggregator("aggregator", self.message_broker)
 
         directory.add_actor("messagebroker", self.message_broker)

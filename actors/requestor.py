@@ -20,11 +20,12 @@ class Requestor(Actor):
         self.name = name
         self.message_broker = message_broker
         self.state = States.Idle        
+        self.route = route
 
         gevent.sleep(4)
    
         # self.url = os.getenv('EVENTS_SERVER_URL') + '/sensors'
-        self.url = os.getenv('EVENTS_SERVER_URL') + route
+        self.url = os.getenv('EVENTS_SERVER_URL') + "/" + self.route
         try:
             self.response = with_urllib3(self.url)
             print("OK")
@@ -82,7 +83,7 @@ class Requestor(Actor):
         if message == "start":
             self.get_printer_actor().inbox.put({"text":"Requestor starting...", "type":"header"})
             self.supervisor = directory.get_actor('supervisor')
-            self.supervisor.subscribe("send-data-iot")
+            self.subscribe("send-data-iot", self.supervisor.name)
             gevent.spawn(self.loop)
 
 
@@ -102,6 +103,6 @@ class Requestor(Actor):
     def publish(self, topic, message):
         self.message_broker.inbox.put('{"publish":"' +topic + '":"' + message + '"}')
 
-    def subscribe(self, topic):
-        self.message_broker.inbox.put('{"subscribe":"' + self.name + '":"' + topic + '"}')        
+    def subscribe(self, topic, name):
+        self.get_message_broker().inbox.put('{"subscribe":"' + name + '":"' + topic + '"}')        
 
