@@ -3,7 +3,6 @@ from .mysseclient import with_urllib3
 from .mysseclient import with_urllib3
 import requests
 from .mydirectory import directory
-from .webactor import WebActor
 from gevent.queue import Queue
 from enum import Enum
 import gevent
@@ -63,7 +62,9 @@ class Requestor(Actor):
             self.publish("print-topic", str({"text":"...Requesting work...", "type":"warning"}))
             
             if(mymessage=='{"message": panic}'):
-              self.get_printer_actor().inbox.put({"text":" PANIC  ", "type":"error"})
+              self.publish("print-topic", str({"text":" PANIC  ", "type":"error"}))
+              # self.get_printer_actor().inbox.put({"text":" PANIC  ", "type":"error"})
+
               # self.supervisor.inbox.put('PANIC')
               self.publish("send-data-iot", "PANIC")
             elif(mymessage):

@@ -43,7 +43,8 @@ class Aggregator(Actor):
                 # self.get_printer_actor().inbox.put({"text":"PREDICTED_WEATHER_FINAL:" + predicted_weather, "type":"green_header"})
                 self.publish("print-topic", str({"text":"PREDICTED_WEATHER_FINAL:" + predicted_weather, "type":"green_header"}))
 
-                self.get_web_actor().inbox.put("PREDICTED_WEATHER_FINAL:" + predicted_weather)
+                # self.get_web_actor().inbox.put("PREDICTED_WEATHER_FINAL:" + predicted_weather)
+                self.publish("web-data-topic", "PREDICTED_WEATHER_FINAL:" + predicted_weather)
 
             self.reinit()
             self.last_time = self.current_time
@@ -71,7 +72,7 @@ class Aggregator(Actor):
     def print_result(self, text):
         # self.self.get_printer_actor().inbox.put({"text":text, "type":"green_header"})
         self.publish("print-topic", str({"text":text, "type":"green_header"}))
-        
+
 
 
     def set_delay_time(self, new_delay_time):

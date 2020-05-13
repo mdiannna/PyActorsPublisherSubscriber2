@@ -37,8 +37,10 @@ class Worker(Actor):
                     "timestamp": timestamp
                 }
 
-                self.get_web_actor().inbox.put("DATA:" +str(json.dumps(str(sensor_data_web))))
+                # self.get_web_actor().inbox.put("DATA:" +str(json.dumps(str(sensor_data_web))))
+                self.publish("web-data-topic", "DATA:" +str(json.dumps(str(sensor_data_web))))
 
+                
                 self.get_aggregator_actor().inbox.put("PREDICTED_WEATHER:" + predicted_weather)
                 # self.get_printer_actor().inbox.put({"text":"PREDICTED_WEATHER:" + predicted_weather, "type":"header"})
                 self.publish("print-topic", str({"text":"PREDICTED_WEATHER:" + predicted_weather, "type":"header"}))
