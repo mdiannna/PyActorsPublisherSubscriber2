@@ -46,6 +46,8 @@ class Pool(Actor):
 
     def start(self):
         # self.message_broker.start()
+        self.message_broker.inbox.put('{"subscribe":"supervisor":"send-data-iot"}')
+        
         self.printer_actor.start()
         self.web_actor.start()
         self.requestor.start()
@@ -54,7 +56,6 @@ class Pool(Actor):
         
         self.requestor.inbox.put('start')
         self.supervisor.inbox.put('start')
-        self.message_broker.inbox.put('{"subscribe":"supervisor":"send-data-iot"}')
 
 
         gevent.joinall([self.requestor, self.supervisor, self.message_broker])

@@ -5,11 +5,11 @@ import json
 from .mydirectory import directory
 
 class Worker(Actor):
-    def __init__(self, name, message_broker):
+    def __init__(self, name, message_broker, route):
         super().__init__()
         self.name = name
         self.state = States.Idle
-        
+        self.route = route
         self.message_broker = message_broker
 
     def receive(self, message):
@@ -58,4 +58,37 @@ class Worker(Actor):
         
     def get_directory(self):
         return directory
+
+    def restart(self):
+        name = self.get_name()
+
+        msg_broker = self.message_broker
+
+        self.unsubscribe("worker-data-topic-" + self.route, self.name)
+        
+        worker_to_be_restarted = Worker(name, msg_broker, self.route)
+        worker_to_be_restarted.start()
+
+       
+        directory.add_actor(name, worker_to_be_restarted)
+
+        self.stop()
+
+        worker_to_be_restarted.subscribe("worker-data-topic-" + worker_to_be_restarted.route, worker_to_be_restarted.name)
+
+        return worker_to_be_restarted
+
+    def get_message_broker(self):
+        return self.message_broker
+    
+
+    def publish(self, topic, message):
+        self.get_message_broker().inbox.put('{"publish":"' +topic + '":"' + message + '"}')
+
+    def subscribe(self, topic, name):
+        self.get_message_broker().inbox.put('{"subscribe":"' + name + '":"' + topic + '"}')        
+
+    def unsubscribe(self, topic, name):
+        self.get_message_broker().inbox.put('{"unsubscribe":"' + name + '":"' + topic + '"}')        
+
 

@@ -52,3 +52,15 @@ class Directory:
 
         self.actors[name] = new_requestor.get_name()
         return new_requestor
+
+    def restart_worker(self, current_worker):
+        name = current_worker.get_name()
+
+        msg_broker = current_worker.message_broker
+
+        worker_to_be_restarted = Worker(name, msg_broker, current_worker.route)
+        worker_to_be_restarted.start()
+        self.add_actor(name, worker_to_be_restarted)
+
+        current_worker.stop()
+        return worker_to_be_restarted

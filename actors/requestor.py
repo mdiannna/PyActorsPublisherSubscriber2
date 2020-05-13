@@ -57,7 +57,7 @@ class Requestor(Actor):
             # print(event.data)
             # # only for debug
             # # print(event)
-            gevent.sleep(1)
+            gevent.sleep(0.5)
 
             self.get_printer_actor().inbox.put({"text":"...Requesting work...", "type":"warning"})
             

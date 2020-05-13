@@ -13,7 +13,7 @@ class WorkerSupervisor(Actor):
         self.max_work_capacity = 10
         self.workers = Queue(maxsize=self.max_work_capacity)
         self.workers_cnt_id = 0
-        self.worker_restart_policy = WorkerRestartPolicy()
+        # self.worker_restart_policy = WorkerRestartPolicy()
         self.message_broker = message_broker
         self.route = route
     
@@ -30,7 +30,7 @@ class WorkerSupervisor(Actor):
 
     def add_worker(self):
         self.workers_cnt_id += 1
-        new_worker = Worker("worker%d" % self.workers_cnt_id, self.message_broker)
+        new_worker = Worker("worker%d" % self.workers_cnt_id, self.message_broker, self.route)
         # self.get_printer_actor().inbox.put({"text":"ADD WORKER %d" % self.workers_cnt_id, "type":'warning'})
         self.publish("print-topic", str({"text":"ADD WORKER %d" % self.workers_cnt_id, "type":'warning'}))
 
@@ -42,7 +42,7 @@ class WorkerSupervisor(Actor):
 
     def add_named_worker(self, name):
         self.workers_cnt_id += 1
-        new_worker = Worker(name, self.message_broker)
+        new_worker = Worker(name, self.message_broker, self.route)
         directory.add_actor(new_worker.name, new_worker)
         # self.get_printer_actor().inbox.put({"text":"ADD NAMED WORKER %s" % name, "type":'warning'})
         self.publish("print-topic", str({"text":"ADD NAMED WORKER %s" % name, "type":'warning'}))
@@ -72,7 +72,8 @@ class WorkerSupervisor(Actor):
         current_worker.inbox.put("PANIC")
 
     def process_worker_fail(self, current_worker):
-        worker_to_be_restarted = self.worker_restart_policy.restart_worker(current_worker)
+        worker_to_be_restarted = current_worker.restart()
+        # worker_to_be_restarted = directory.restart_worker(current_worker)
 
         name = current_worker.get_name()
         self.publish("print-topic", str({"text":"--killed worker %s" % name, "type":'warning'}))
@@ -184,9 +185,9 @@ class WorkerSupervisor(Actor):
             current_worker = self.workers.get()
             self.publish("print-topic", str({"text":"Sending work to worker %s [%d]" % (current_worker.name, self.inbox.qsize()), "type":"warning"}))
             
-            # self.publish("worker-data-topic-" + self.route, message)
+            self.publish("worker-data-topic-" + self.route, message)
             # TODO!!!!! publish
-            current_worker.inbox.put(message)
+            # current_worker.inbox.put(message)
             self.workers.put(current_worker)
 
 
