@@ -9,6 +9,6 @@ def set_session_var(name, value):
 
 
 def get_session_var(name):
-	return session.get[name]
+	return session.get(name)
 
 

@@ -8,11 +8,9 @@ class MessageBroker(Actor):
         self.name = name
         self.state = States.Idle
 
-        # self.topicsActors = {"":[]}
         self.topicsActors = {}
 
     def subscribe(self, actorname, topic):
-        # For debug:
         # print("***subscribe***"  + actorname + " **" +topic)
         if not topic in self.topicsActors:
             self.topicsActors[topic] = []
@@ -23,14 +21,9 @@ class MessageBroker(Actor):
         if topic in self.topicsActors:
             if(actorname in self.topicsActors[topic]):
                 self.topicsActors[topic].remove(actorname)
-        # TODO?????
-        # actorname.inbox.put("You unsubscribed from topic")
 
-    # TODO: test
     def publish(self, topic, message):
-        # For debug:
         # print("***Publish message***" + topic + "**" + message)
-        
         if not topic in self.topicsActors:
             self.topicsActors[topic] = []
 
@@ -54,15 +47,11 @@ class MessageBroker(Actor):
     # {"publish":"topic":"message"} 
     def receive(self, message):
         self.state = States.Running
-        # print("RECEIVE!!!!!!******")
-        # print(message)
 
         isValid = True
 
         if message[0] != "{":
             isValid = False
-            # # TOOD" nu stiu daca trebuie sa returneze ceva
-            # return "MESSAGE_NOT_VALID"
 
         command1, command2, command3 = self.separateCommands(message)
 

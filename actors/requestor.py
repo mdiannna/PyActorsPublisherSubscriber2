@@ -20,6 +20,7 @@ class Requestor(Actor):
         self.message_broker = message_broker
         self.state = States.Idle        
         self.route = route
+        self.DELAY_EVENTS = 1
 
         gevent.sleep(4)
    
@@ -44,51 +45,28 @@ class Requestor(Actor):
         messages = sseclient.SSEClient(self.url)
         for event in messages:
 
-            # print("##############")
-            # print(event)
-            # print(str(event))
-
             mymessage = str(event)
-            # if(event):
-            #     print(event.data)
-            #     data = str(event).strip("'<>() ").replace('\'', '\"')
-            #     print(json.loads(data))
-            # print(event.data)
-            # # only for debug
-            # # print(event)
-            gevent.sleep(1)
+           
+            gevent.sleep(self.DELAY_EVENTS)
 
-            # self.get_printer_actor().inbox.put({"text":"...Requesting work...", "type":"warning"})
             self.publish("print-topic", str({"text":"...Requesting work...", "type":"warning"}))
             
             if(mymessage=='{"message": panic}'):
               self.publish("print-topic", str({"text":" PANIC  ", "type":"error"}))
-              # self.get_printer_actor().inbox.put({"text":" PANIC  ", "type":"error"})
-
-              # self.supervisor.inbox.put('PANIC')
               self.publish("send-data-" + self.route, "PANIC")
             elif(mymessage):
-                # self.get_printer_actor().inbox.put({"text":mymessage, "type":"pprint"})
                 self.publish("print-topic", str({"text":mymessage, "type":"pprint"}))
 
-                # sensors_data = json.loads(event)
                 sensors_data = mymessage
 
                 self.last_sensors_data = sensors_data
-                # self.supervisor.inbox.put(sensors_data)
                 self.publish("send-data-" + self.route, sensors_data)
 
-        
-            # self.get_printer_actor().inbox.put({"text":"----", "type":"blue"})
 
 
     def receive(self, message):
         if message == "start":
-            # self.get_printer_actor().inbox.put({"text":"Requestor starting...", "type":"header"})
             self.publish("print-topic", str({"text":"Requestor starting...", "type":"header"}))
-
-            # self.supervisor = directory.get_actor('supervisor_' + self.route)
-            # self.subscribe("send-data-" + self.route, self.supervisor.name)
             gevent.spawn(self.loop)
 
 

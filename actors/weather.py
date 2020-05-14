@@ -15,13 +15,11 @@ def aggregate_sensor_values_iot(data):
         data = eval(data)
 
     athm_pressure = (data["atmo_pressure_sensor_1"] + data["atmo_pressure_sensor_2"]) / 2.0
-    # humidity = (data["humidity_sensor_1"] + data["humidity_sensor_2"]) / 2.0
-    # light = (data["light_sensor_1"] + data["light_sensor_2"]) / 2.0
-    # temperature = (data["temperature_sensor_1"] + data["temperature_sensor_2"]) / 2.0
     wind_speed = (data["wind_speed_sensor_1"] + data["wind_speed_sensor_2"]) / 2.0
     timestamp = data["unix_timestamp_100us"]
 
     return  wind_speed, athm_pressure, timestamp
+
 
 def aggregate_sensor_values_sensors(data):
     if(isinstance(data, str) ):
@@ -32,20 +30,13 @@ def aggregate_sensor_values_sensors(data):
 
     return light, timestamp
 
-# TODO:
-# This will be xml!
-def aggregate_sensor_values_legacy_sensors(data):
-#  humidity_percent x2
-# temperature_celsius x2
 
+def aggregate_sensor_values_legacy_sensors(data):
     if(isinstance(data, str) ):
         data = eval(data)
 
-    # athm_pressure = (data["atmo_pressure_sensor_1"] + data["atmo_pressure_sensor_2"]) / 2.0
     humidity = (data["humidity_sensor_1"] + data["humidity_sensor_2"]) / 2.0
-    # light = (data["light_sensor_1"] + data["light_sensor_2"]) / 2.0
     temperature = (data["temperature_sensor_1"] + data["temperature_sensor_2"]) / 2.0
-    # wind_speed = (data["wind_speed_sensor_1"] + data["wind_speed_sensor_2"]) / 2.0
     timestamp = data["unix_timestamp_100us"]
 
     return humidity, temperature, timestamp
@@ -89,25 +80,3 @@ def print_aggregated_values(athm_pressure, humidity, light, temperature, wind_sp
     print("TEMPERATURE:", temperature)
     print("WIND_SPEED: ", wind_speed)
     print("TIMESTAMP: ", timestamp)
-
-###########
-# EXAMPLE USAGE:
-###########
-# data = {
-#   'atmo_pressure_sensor_1': 729.5990508104659,
-#   'atmo_pressure_sensor_2': 628.5908617577834,
-#   'humidity_sensor_1': 98.17478989206458,
-#   'humidity_sensor_2': 18.64852258459042,
-#   'light_sensor_1': 84.0,
-#   'light_sensor_2': 177.0,
-#   'temperature_sensor_1': 12.204162287830876,
-#   'temperature_sensor_2': 12.294824751614762,
-#   'unix_timestamp_us': 1584002802157924,
-#   'wind_speed_sensor_1': 35.17914031094192,
-#   'wind_speed_sensor_2': 42.27585612358403
-# }
-# athm_pressure, humidity, light, temperature, wind_speed = aggregate_sensor_values(data)
-# print_aggregated_values(athm_pressure, humidity, light, temperature, wind_speed)
-# print("---")
-# print("PREDICT WEATHER:")
-# print(predict_weather(athm_pressure, humidity, light, temperature, wind_speed))

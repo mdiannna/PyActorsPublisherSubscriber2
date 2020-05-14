@@ -13,7 +13,6 @@ class WorkerSupervisor(Actor):
         self.max_work_capacity = 10
         self.workers = Queue(maxsize=self.max_work_capacity)
         self.workers_cnt_id = 0
-        # self.worker_restart_policy = WorkerRestartPolicy()
         self.message_broker = message_broker
         self.route = route
     
@@ -31,7 +30,6 @@ class WorkerSupervisor(Actor):
     def add_worker(self):
         self.workers_cnt_id += 1
         new_worker = Worker("worker%d_" % self.workers_cnt_id + self.route, self.message_broker, self.route)
-        # self.get_printer_actor().inbox.put({"text":"ADD WORKER %d" % self.workers_cnt_id, "type":'warning'})
         self.publish("print-topic", str({"text":"ADD WORKER %s" % new_worker.name, "type":'warning'}))
 
         new_worker.start()
@@ -44,7 +42,6 @@ class WorkerSupervisor(Actor):
         self.workers_cnt_id += 1
         new_worker = Worker(name, self.message_broker, self.route)
         directory.add_actor(new_worker.name, new_worker)
-        # self.get_printer_actor().inbox.put({"text":"ADD NAMED WORKER %s" % name, "type":'warning'})
         self.publish("print-topic", str({"text":"ADD NAMED WORKER %s" % name, "type":'warning'}))
 
         new_worker.start()
@@ -68,8 +65,6 @@ class WorkerSupervisor(Actor):
     def process_panic_message(self, current_worker):
         # print("PANIC")
         self.publish("print-topic", str({"text":"!!! PANIC !!!", "type":'warning-bold'}))
-        # TODO!!!!! publish
-        # current_worker.inbox.put("PANIC")
         self.publish("worker-data-topic-"+self.route,"PANIC")
 
     def process_worker_fail(self, current_worker):
@@ -135,7 +130,6 @@ class WorkerSupervisor(Actor):
         
         while (not self.workers.empty()) and cnt < size:
             worker = self.workers.get()
-            # print(worker.get_name())
             if(worker.get_name() == name):
                 self.workers.put(worker)
                 return worker
@@ -176,24 +170,17 @@ class WorkerSupervisor(Actor):
             self.process_panic_message(current_worker)
             self.workers.put(current_worker)
 
-        # when worker sends notification of exception, after panic message for example
         elif "EXCEPTION WORKER" in message:
             start = message.find('EXCEPTION WORKER ') + len("EXCEPTION WORKER ")
             worker_name = message[start:]
-            # for debug
-            # print("WORKER_NAME" + worker_name)
-            # current_worker = self.get_worker_name(worker_name)
             current_worker = directory.get_actor(worker_name)
             self.process_worker_fail(current_worker)
             
-        # send work to calculate to worker
         else:
             current_worker = self.workers.get()
             self.publish("print-topic", str({"text":"Sending work to worker %s [%d]" % (current_worker.name, self.inbox.qsize()), "type":"warning"}))
             
             self.publish("worker-data-topic-" + self.route, message)
-            # TODO!!!!! publish
-            # current_worker.inbox.put(message)
             self.workers.put(current_worker)
 
 

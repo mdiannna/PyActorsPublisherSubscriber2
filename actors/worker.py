@@ -24,13 +24,8 @@ class Worker(Actor):
             # raise Exception('PANIC')
         else:
             self.publish("print-topic", str({"text":"I %s was told to process '%s' [%d]" %(self.name, message, self.inbox.qsize()), "type":"blue"}))
-            # self.get_printer_actor().inbox.put({"text":"I %s was told to process '%s' [%d]" %(self.name, message, self.inbox.qsize()), "type":"blue"})
             message = eval(message)["message"]
             
-            # # For debug
-            # print("DATAAAAAAAAAAAAAAAA")
-            # print(message)
-            # print(self.route)
             athm_pressure, humidity, light, temperature, wind_speed, timestamp = -1,-1,-1,-1,-1,-1
 
             if(self.route == 'iot'):
@@ -43,19 +38,9 @@ class Worker(Actor):
                 data2 = self.parse_legacy_sensors_data(message)
                 humidity, temperature, timestamp = weather.aggregate_sensor_values_legacy_sensors(data2)
 
-            
-
-            # TODO:
-            # elif(self.route == 'legacy_sensors'):
-
-            # athm_pressure, humidity, light, temperature, wind_speed, timestamp = weather.aggregate_sensor_values(message)
-            # TODO in aggregator:
-             # predicted_weather = weather.predict_weather(athm_pressure, humidity, light, temperature, wind_speed)
-           
 
             sensors_data_web = {
                 "atmo_pressure": athm_pressure,
-                # (if_test_is_false, if_test_is_true)[test]
                 "humidity": humidity ,
                 "light": light,
                 "temperature" : temperature,
@@ -63,20 +48,7 @@ class Worker(Actor):
                 "timestamp": timestamp
             }
             self.publish("print-topic", str({"text":"sensors_data_web:" + str(sensors_data_web), "type":"red"}))
-
-
-            # self.get_web_actor().inbox.put("DATA:" +str(json.dumps(str(sensors_data_web))))
-            # TODO:
-            # self.publish("web-data-topic", "DATA:" +str(json.dumps(str(sensors_data_web))))
-            
             self.publish("aggregator-data-topic", "DATA:" +str(json.dumps(str(sensors_data_web))))
-
-            
-            # predicted_weather = "CLOUDY"
-            # self.get_aggregator_actor().inbox.put("PREDICTED_WEATHER:" + predicted_weather)
-            # self.get_printer_actor().inbox.put({"text":"PREDICTED_WEATHER:" + predicted_weather, "type":"header"})
-            # self.publish("print-topic", str({"text":"PREDICTED_WEATHER:" + predicted_weather, "type":"header"}))
-        
 
             self.state = States.Idle
         # except:
@@ -106,15 +78,11 @@ class Worker(Actor):
 
         msg_broker = self.message_broker
 
-        # self.unsubscribe("worker-data-topic-" + self.route, self.name)
-        
         worker_to_be_restarted = Worker(name, msg_broker, self.route)
         worker_to_be_restarted.start()
 
-       
         directory.remove_actor(self)
         directory.add_actor(name, worker_to_be_restarted)
-        # worker_to_be_restarted.subscribe("worker-data-topic-" + worker_to_be_restarted.route, worker_to_be_restarted.name)
 
         self.stop()
 
@@ -139,13 +107,11 @@ class Worker(Actor):
         data2 = {}
         data = xmltodict.parse(message)
         data = json.loads(json.dumps(data))["SensorReadings"]
-        # print(data)
         data2["humidity_sensor_1"] = float(data['humidity_percent']["value"][0])
         data2["humidity_sensor_2"] = float(data['humidity_percent']["value"][1])
         data2["temperature_sensor_1"] = float(data['temperature_celsius']["value"][0] )
         data2["temperature_sensor_2"] =  float(data['temperature_celsius']["value"][1])
         data2["unix_timestamp_100us"] = float(data['@unix_timestamp_100us'])
-        # print(data2)  
         return data2
 
 

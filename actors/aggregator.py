@@ -17,7 +17,6 @@ class Aggregator(Actor):
         self.name = name
         self.state = States.Idle
         self.printer_actor = directory.get_actor("printeractor")
-        # self.printer_actor.start()
         self.message_broker = message_broker
         self.last_time = time.time()
         self.current_time = time.time()
@@ -32,9 +31,7 @@ class Aggregator(Actor):
 
         self.reinit()
         self.DELAY_TIME = 5
-        # For debug
-        print("Aggregator init")
-
+        
 
     def start(self):
         Actor.start(self)
@@ -49,12 +46,10 @@ class Aggregator(Actor):
         self.state = States.Running
         self.current_time = time.time()
         
-        # print("==============AGGREGATOR====================!!!")
         if(message[0:5]=="DATA:"):
             message = message.replace("DATA:", "").replace('"', "")
-        # print(eval(message))
+
         incoming_data = eval(message)
-        # print(incoming_data)
 
         atmo_pressure = incoming_data["atmo_pressure"]
         humidity = incoming_data["humidity"]
@@ -81,39 +76,13 @@ class Aggregator(Actor):
         if(timestamp != -1):
             self.sensor_data["timestamp"] = timestamp
 
-        # TODO:
-        if(self.current_time - self.last_time >= self.DELAY_TIME ):                
+        if(self.current_time - self.last_time >= self.DELAY_TIME ):
             predicted_weather = self.get_predicted_weather()
-
             self.publish("print-topic", str({"text":"PREDICTED_WEATHER_FINAL:" + predicted_weather, "type":"green_header"}))
             self.publish("web-data-topic", "PREDICTED_WEATHER_FINAL:" + predicted_weather)
-
-            # print(globals()["PREDICTED_WEATHER_FINAL"])
-            # global PREDICTED_WEATHER_FINAL
-            # PREDICTED_WEATHER_FINAL = predicted_weather
-            # print("")
-            # print("PREDICTED_WEATHER_FINAL!!!" + PREDICTED_WEATHER_FINAL)
-            # print("")
-
-            # os.environ["PREDICTED_WEATHER_FINAL"] = predicted_weather
-
-
-
             self.publish("web-data-topic", "DATA:" +str(json.dumps(str(self.sensor_data))))
+              
             
-        #         # self.get_printer_actor().inbox.put({"text":"PREDICTED_WEATHER_FINAL:" + predicted_weather, "type":"green_header"})
-
-        #         # self.get_web_actor().inbox.put("PREDICTED_WEATHER_FINAL:" + predicted_weather)
-        #         self.publish("web-data-topic", "PREDICTED_WEATHER_FINAL:" + predicted_weather)
-
-        #     self.reinit()
-        #     self.last_time = self.current_time
-        
-        # prediction = message  # example: "PREDICTED_WEATHER:SNOW"
-
-        # prediction = prediction.replace("PREDICTED_WEATHER:", "")
-        # self.predictions.append(prediction)
-
         self.state = States.Idle
 
 
@@ -130,9 +99,7 @@ class Aggregator(Actor):
         
 
     def print_result(self, text):
-        # self.self.get_printer_actor().inbox.put({"text":text, "type":"green_header"})
         self.publish("print-topic", str({"text":text, "type":"green_header"}))
-
 
 
     def set_delay_time(self, new_delay_time):
@@ -166,8 +133,4 @@ class Aggregator(Actor):
         predicted_weather = weather.predict_weather(atmo_pressure, humidity, light, temperature, wind_speed)
 
         return predicted_weather
-
-
-
-
 

@@ -45,7 +45,6 @@ class Pool(Actor):
         directory.add_actor("supervisor_sensors", self.supervisor_sensors)
         directory.add_actor("supervisor_legacy_sensors", self.supervisor_legacy_sensors)
        
-        # directory.add_actor("client", self.requestor)
         directory.add_actor("requestor_iot", self.requestor_iot)
         directory.add_actor("requeestor_sensors", self.requestor_sensors)
         directory.add_actor("requeestor_legacy_sensors", self.requestor_legacy_sensors)
