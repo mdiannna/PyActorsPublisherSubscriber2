@@ -24,6 +24,8 @@ class PrinterActor(Actor):
             prettyprint.print_warning(prettyprint.bold(message["text"]))
         if message["type"]=="error":
             prettyprint.print_error(prettyprint.bold(message["text"]))
+        if message["type"]=="red":
+            prettyprint.print_error(message["text"])
         if message["type"]=="blue" or message["type"]=="normal":
             prettyprint.print_blue(message["text"])
         if message["type"]=="green" or message["type"]=="ok" or message["type"]=="success":

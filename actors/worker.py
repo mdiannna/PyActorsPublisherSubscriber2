@@ -12,6 +12,7 @@ class Worker(Actor):
         self.route = route
         self.message_broker = message_broker
 
+
     def receive(self, message):
         self.state = States.Running
 
@@ -24,43 +25,45 @@ class Worker(Actor):
             self.publish("print-topic", str({"text":"I %s was told to process '%s' [%d]" %(self.name, message, self.inbox.qsize()), "type":"blue"}))
             # self.get_printer_actor().inbox.put({"text":"I %s was told to process '%s' [%d]" %(self.name, message, self.inbox.qsize()), "type":"blue"})
             message = eval(message)["message"]
-             # predicted_weather = weather.predict_weather(athm_pressure, humidity, light, temperature, wind_speed)
-            print("DATAAAAAAAAAAAAAAAA")
-            print(message)
-            print(self.route)
+            
+            # # For debug
+            # print("DATAAAAAAAAAAAAAAAA")
+            # print(message)
+            # print(self.route)
+            athm_pressure, humidity, light, temperature, wind_speed, timestamp = -1,-1,-1,-1,-1,-1
 
             if(self.route == 'iot'):
                 wind_speed, athm_pressure, timestamp = weather.aggregate_sensor_values_iot(message)
 
             elif(self.route == 'sensors'):
                 light, timestamp = weather.aggregate_sensor_values_sensors(message)
-
+            # TODO:
             # elif(self.route == 'legacy_sensors'):
 
             # athm_pressure, humidity, light, temperature, wind_speed, timestamp = weather.aggregate_sensor_values(message)
             # TODO in aggregator:
+             # predicted_weather = weather.predict_weather(athm_pressure, humidity, light, temperature, wind_speed)
            
 
+            sensors_data_web = {
+                "atmo_pressure": athm_pressure,
+                # (if_test_is_false, if_test_is_true)[test]
+                "humidity": humidity ,
+                "light": light,
+                "temperature" : temperature,
+                "wind": wind_speed,
+                "timestamp": timestamp
+            }
+            self.publish("print-topic", str({"text":"sensors_data_web:" + str(sensors_data_web), "type":"red"}))
 
-            # sensor_data_web = {
-            #     "atmo_pressure": (-1, athm_pressure)[athm_pressure],
-            #     # (if_test_is_false, if_test_is_true)[test]
-            #     "humidity": (-1, humidity)[humidity] ,
-            #     "light": (-1,light)[light],
-            #     "temperature" : (-1, temperature)[temperature],
-            #     "wind": (-1, wind_speed)[wind_speed],
-            #     "timestamp": (-1, timestamp)[timestamp]
-            # }
-            # self.publish("print-topic", str({"text":"sensors_data_web:" + sensors_data_web, "type":"header"}))
 
-
-            # # self.get_web_actor().inbox.put("DATA:" +str(json.dumps(str(sensor_data_web))))
-            # self.publish("web-data-topic", "DATA:" +str(json.dumps(str(sensor_data_web))))
+            # self.get_web_actor().inbox.put("DATA:" +str(json.dumps(str(sensors_data_web))))
+            self.publish("web-data-topic", "DATA:" +str(json.dumps(str(sensors_data_web))))
 
             
-            # self.get_aggregator_actor().inbox.put("PREDICTED_WEATHER:" + predicted_weather)
-            # # self.get_printer_actor().inbox.put({"text":"PREDICTED_WEATHER:" + predicted_weather, "type":"header"})
-            # self.publish("print-topic", str({"text":"PREDICTED_WEATHER:" + predicted_weather, "type":"header"}))
+            self.get_aggregator_actor().inbox.put("PREDICTED_WEATHER:" + predicted_weather)
+            # self.get_printer_actor().inbox.put({"text":"PREDICTED_WEATHER:" + predicted_weather, "type":"header"})
+            self.publish("print-topic", str({"text":"PREDICTED_WEATHER:" + predicted_weather, "type":"header"}))
         
 
             self.state = States.Idle
@@ -70,6 +73,9 @@ class Worker(Actor):
 
     def get_printer_actor(self):
         return directory.get_actor('printeractor')
+
+    def initWeatherVars(athm_pressure, humidity, light, temperature, wind_speed, timestamp):
+        return -1, -1, -1, -1, -1, -1
 
     def get_web_actor(self):
         return directory.get_actor('webactor')
