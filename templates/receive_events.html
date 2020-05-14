@@ -379,12 +379,24 @@ source.addEventListener('greeting', function(event) {
       str1 = "timestamp': ";
       timestamp = data.substring(data.search(str1) + str1.length, data.search(str1) + str1.length + 5.0);
 
-      document.getElementById("temp").innerHTML = "<p>" + temp1 +"</p>";
-      document.getElementById("humidity").innerHTML = "<p>" + humidity1  + "</p>";
-      document.getElementById("light").innerHTML = "<p>" + light1 +  "</p>";
-      document.getElementById("wind").innerHTML = "<p>" + wind1 +  "</p>";
-      document.getElementById("atm-pressure").innerHTML = "<p>" +atmo1 + "</p>";
-      document.getElementById("timestamp").innerHTML = "<p>" + timestamp  + "</p>";
+      if(temp1 !="-1, '") {
+        document.getElementById("temp").innerHTML = "<p>" + temp1 +"</p>";
+      }
+      if(humidity1 !="-1, '") {
+        document.getElementById("humidity").innerHTML = "<p>" + humidity1  + "</p>";
+      }
+      if(light1 !="-1, '") {
+        document.getElementById("light").innerHTML = "<p>" + light1 +  "</p>";
+      }
+      if(wind1 !="-1, '") {
+        document.getElementById("wind").innerHTML = "<p>" + wind1 +  "</p>";
+      }
+      if(atmo1 !="-1, '") {
+        document.getElementById("atm-pressure").innerHTML = "<p>" +atmo1 + "</p>";
+      }
+      if(timestamp !="-1, '") {
+        document.getElementById("timestamp").innerHTML = "<p>" + timestamp  + "</p>";
+      }
     }
 
 
