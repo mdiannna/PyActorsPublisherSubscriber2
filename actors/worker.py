@@ -3,6 +3,7 @@ from . import weather
 import gevent 
 import json
 from .mydirectory import directory
+import xmltodict
 
 class Worker(Actor):
     def __init__(self, name, message_broker, route):
@@ -37,6 +38,13 @@ class Worker(Actor):
 
             elif(self.route == 'sensors'):
                 light, timestamp = weather.aggregate_sensor_values_sensors(message)
+
+            elif(self.route == 'legacy_sensors'):
+                data2 = self.parse_legacy_sensors_data(message)
+                humidity, temperature, timestamp = weather.aggregate_sensor_values_legacy_sensors(data2)
+
+            
+
             # TODO:
             # elif(self.route == 'legacy_sensors'):
 
@@ -124,6 +132,20 @@ class Worker(Actor):
         self.get_message_broker().inbox.put('{"subscribe":"' + name + '":"' + topic + '"}')        
 
     def unsubscribe(self, topic, name):
-        self.get_message_broker().inbox.put('{"unsubscribe":"' + name + '":"' + topic + '"}')        
+        self.get_message_broker().inbox.put('{"unsubscribe":"' + name + '":"' + topic + '"}')      
+
+
+    def parse_legacy_sensors_data(self, message):
+        data2 = {}
+        data = xmltodict.parse(message)
+        data = json.loads(json.dumps(data))["SensorReadings"]
+        # print(data)
+        data2["humidity_sensor_1"] = float(data['humidity_percent']["value"][0])
+        data2["humidity_sensor_2"] = float(data['humidity_percent']["value"][1])
+        data2["temperature_sensor_1"] = float(data['temperature_celsius']["value"][0] )
+        data2["temperature_sensor_2"] =  float(data['temperature_celsius']["value"][1])
+        data2["unix_timestamp_100us"] = float(data['@unix_timestamp_100us'])
+        # print(data2)  
+        return data2
 
 

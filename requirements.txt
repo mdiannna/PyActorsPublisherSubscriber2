@@ -13,3 +13,4 @@ virtualenv==15.1.0
 Werkzeug==1.0.0
 redis==3.4.1
 flask-sse
+xmltodict

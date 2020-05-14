@@ -34,21 +34,21 @@ def aggregate_sensor_values_sensors(data):
 
 # TODO:
 # This will be xml!
-# def aggregate_sensor_values_legacy_sensors(data):
+def aggregate_sensor_values_legacy_sensors(data):
 #  humidity_percent x2
 # temperature_celsius x2
 
-# if(isinstance(data, str) ):
-#         data = eval(data)
+    if(isinstance(data, str) ):
+        data = eval(data)
 
-#   athm_pressure = (data["atmo_pressure_sensor_1"] + data["atmo_pressure_sensor_2"]) / 2.0
-#   humidity = (data["humidity_sensor_1"] + data["humidity_sensor_2"]) / 2.0
-#   light = (data["light_sensor_1"] + data["light_sensor_2"]) / 2.0
-#   temperature = (data["temperature_sensor_1"] + data["temperature_sensor_2"]) / 2.0
-#   wind_speed = (data["wind_speed_sensor_1"] + data["wind_speed_sensor_2"]) / 2.0
-#   timestamp = data["unix_timestamp_us"]
+    # athm_pressure = (data["atmo_pressure_sensor_1"] + data["atmo_pressure_sensor_2"]) / 2.0
+    humidity = (data["humidity_sensor_1"] + data["humidity_sensor_2"]) / 2.0
+    # light = (data["light_sensor_1"] + data["light_sensor_2"]) / 2.0
+    temperature = (data["temperature_sensor_1"] + data["temperature_sensor_2"]) / 2.0
+    # wind_speed = (data["wind_speed_sensor_1"] + data["wind_speed_sensor_2"]) / 2.0
+    timestamp = data["unix_timestamp_100us"]
 
-#   return athm_pressure, humidity, light, temperature, wind_speed, timestamp
+    return humidity, temperature, timestamp
 
 
 
