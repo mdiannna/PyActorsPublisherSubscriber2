@@ -56,6 +56,7 @@ class Pool(Actor):
         self.message_broker.inbox.put('{"subscribe":"supervisor_iot":"send-data-iot"}')
         # TODO:
         self.message_broker.inbox.put('{"subscribe":"supervisor_sensors":"send-data-sensors"}')   
+        self.message_broker.inbox.put('{"subscribe":"aggregator":"aggregator-data-topic"}')   
         
         self.printer_actor.start()
         self.web_actor.start()
