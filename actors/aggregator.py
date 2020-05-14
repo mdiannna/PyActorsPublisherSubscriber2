@@ -30,7 +30,7 @@ class Aggregator(Actor):
             }
 
         self.reinit()
-        self.DELAY_TIME = 3
+        self.DELAY_TIME = 4
         # For debug
         print("Aggregator init")
 
