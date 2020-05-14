@@ -6,6 +6,7 @@ import app
 import requests
 import os
 from flask import request
+import json
 
 class WebActor(Actor):
     def __init__(self, name, message_broker):
@@ -29,6 +30,8 @@ class WebActor(Actor):
         if os.getenv("SEND_WEB")=='NO_SEND':
             print("NO_SEND")
         else:
+            if("REDICTED_WEATHER_FINAL" in message):
+                requests.post(self.url.replace('/send', '/post-prediction/'+message), data = {'prediction':message})
             r = requests.get(self.url + '/' + message)
 
 

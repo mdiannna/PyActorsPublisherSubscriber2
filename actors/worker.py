@@ -72,10 +72,10 @@ class Worker(Actor):
             self.publish("aggregator-data-topic", "DATA:" +str(json.dumps(str(sensors_data_web))))
 
             
-            predicted_weather = "CLOUDY"
+            # predicted_weather = "CLOUDY"
             # self.get_aggregator_actor().inbox.put("PREDICTED_WEATHER:" + predicted_weather)
             # self.get_printer_actor().inbox.put({"text":"PREDICTED_WEATHER:" + predicted_weather, "type":"header"})
-            self.publish("print-topic", str({"text":"PREDICTED_WEATHER:" + predicted_weather, "type":"header"}))
+            # self.publish("print-topic", str({"text":"PREDICTED_WEATHER:" + predicted_weather, "type":"header"}))
         
 
             self.state = States.Idle

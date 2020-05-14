@@ -5,10 +5,11 @@ import time
 import copy
 from .helpers import most_frequent
 import json
-
 from . import weather
 
 from .mydirectory import directory
+from .helpers import set_session_var, get_session_var
+import os
 
 class Aggregator(Actor):
     def __init__(self, name, message_broker):
@@ -30,7 +31,7 @@ class Aggregator(Actor):
             }
 
         self.reinit()
-        self.DELAY_TIME = 4
+        self.DELAY_TIME = 5
         # For debug
         print("Aggregator init")
 
@@ -44,15 +45,16 @@ class Aggregator(Actor):
 
 
     def receive(self, message):
+
         self.state = States.Running
         self.current_time = time.time()
         
-        print("==============AGGREGATOR====================!!!")
+        # print("==============AGGREGATOR====================!!!")
         if(message[0:5]=="DATA:"):
             message = message.replace("DATA:", "").replace('"', "")
         # print(eval(message))
         incoming_data = eval(message)
-        print(incoming_data)
+        # print(incoming_data)
 
         atmo_pressure = incoming_data["atmo_pressure"]
         humidity = incoming_data["humidity"]
@@ -85,6 +87,17 @@ class Aggregator(Actor):
 
             self.publish("print-topic", str({"text":"PREDICTED_WEATHER_FINAL:" + predicted_weather, "type":"green_header"}))
             self.publish("web-data-topic", "PREDICTED_WEATHER_FINAL:" + predicted_weather)
+
+            # print(globals()["PREDICTED_WEATHER_FINAL"])
+            # global PREDICTED_WEATHER_FINAL
+            # PREDICTED_WEATHER_FINAL = predicted_weather
+            # print("")
+            # print("PREDICTED_WEATHER_FINAL!!!" + PREDICTED_WEATHER_FINAL)
+            # print("")
+
+            # os.environ["PREDICTED_WEATHER_FINAL"] = predicted_weather
+
+
 
             self.publish("web-data-topic", "DATA:" +str(json.dumps(str(self.sensor_data))))
             

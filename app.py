@@ -15,6 +15,8 @@ import json
 import pprint
 import sseclient
 
+from flask import session
+import json
 
 def create_app():
   # create flask app
@@ -57,6 +59,30 @@ def receiveSSE():
   pool = myactors.Pool()
   gevent.joinall([gevent.spawn(pool.start)])
 
+
+@app.route('/get-prediction')
+def getPrediction():
+  # global PREDICTED_WEATHER_FINAL
+  # print(globals()["PREDICTED_WEATHER_FINAL"])
+  # predicted_weather  = os.getenv('EVENTS_SERVER_URL') 
+  predicted_weather = session.get("PREDICTED_WEATHER_FINAL")  
+  print("PREDICTIOn!!!" + predicted_weather)
+  return "PREDDICTION!"
+
+
+@app.route('/post-prediction/<message>', methods=['GET', 'POST'])
+def postPrediction(message):
+  if(request.method=='POST'):
+    print(request.method)
+    print(message)
+    session["PREDICTED_WEATHER_FINAL"] = "Cloudy"
+  return json.dumps({'success':True}), 200, {'ContentType':'application/json'} 
+
+
+  
+
+
+# os.environ["PREDICTED_WEATHER_FINAL"] = "computing"
 
 os.environ['EVENTS_SERVER_URL'] = config['EVENTS_SERVER_URL'] 
 os.environ["SEND_URL"] = config["SEND_URL"]
