@@ -44,5 +44,12 @@ $docker-compose up
 
 Also check your config.py if it is configured to work woth docker or local
 
+
+
+### Running locally
+$docker run -p 4000:4000 alexburlacu/rtp-server:lab2 
+$ sudo service redis-server start
+
+
 ## Author
 Marusic Diana, FAF-171

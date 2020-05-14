@@ -12,7 +12,8 @@ class MessageBroker(Actor):
         self.topicsActors = {}
 
     def subscribe(self, actorname, topic):
-        # print("***subscribe***")
+        # For debug:
+        # print("***subscribe***"  + actorname + " **" +topic)
         if not topic in self.topicsActors:
             self.topicsActors[topic] = []
 
@@ -27,9 +28,12 @@ class MessageBroker(Actor):
 
     # TODO: test
     def publish(self, topic, message):
-        # print("***Publish message***")
-        # Find all actors subscribed to topic
-        # actor.inbox.put()
+        # For debug:
+        # print("***Publish message***" + topic + "**" + message)
+        
+        if not topic in self.topicsActors:
+            self.topicsActors[topic] = []
+
         actorSubscribedTopic = self.topicsActors[topic]
 
         for actorname in actorSubscribedTopic:

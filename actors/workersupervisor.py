@@ -30,9 +30,9 @@ class WorkerSupervisor(Actor):
 
     def add_worker(self):
         self.workers_cnt_id += 1
-        new_worker = Worker("worker%d" % self.workers_cnt_id, self.message_broker, self.route)
+        new_worker = Worker("worker%d_" % self.workers_cnt_id + self.route, self.message_broker, self.route)
         # self.get_printer_actor().inbox.put({"text":"ADD WORKER %d" % self.workers_cnt_id, "type":'warning'})
-        self.publish("print-topic", str({"text":"ADD WORKER %d" % self.workers_cnt_id, "type":'warning'}))
+        self.publish("print-topic", str({"text":"ADD WORKER %s" % new_worker.name, "type":'warning'}))
 
         new_worker.start()
         self.workers.put(new_worker)

@@ -56,7 +56,7 @@ class Requestor(Actor):
             # print(event.data)
             # # only for debug
             # # print(event)
-            gevent.sleep(0.5)
+            gevent.sleep(1)
 
             # self.get_printer_actor().inbox.put({"text":"...Requesting work...", "type":"warning"})
             self.publish("print-topic", str({"text":"...Requesting work...", "type":"warning"}))
@@ -66,7 +66,7 @@ class Requestor(Actor):
               # self.get_printer_actor().inbox.put({"text":" PANIC  ", "type":"error"})
 
               # self.supervisor.inbox.put('PANIC')
-              self.publish("send-data-iot", "PANIC")
+              self.publish("send-data-" + self.route, "PANIC")
             elif(mymessage):
                 # self.get_printer_actor().inbox.put({"text":mymessage, "type":"pprint"})
                 self.publish("print-topic", str({"text":mymessage, "type":"pprint"}))
@@ -76,7 +76,7 @@ class Requestor(Actor):
 
                 self.last_sensors_data = sensors_data
                 # self.supervisor.inbox.put(sensors_data)
-                self.publish("send-data-iot", sensors_data)
+                self.publish("send-data-" + self.route, sensors_data)
 
         
             # self.get_printer_actor().inbox.put({"text":"----", "type":"blue"})
@@ -87,8 +87,8 @@ class Requestor(Actor):
             # self.get_printer_actor().inbox.put({"text":"Requestor starting...", "type":"header"})
             self.publish("print-topic", str({"text":"Requestor starting...", "type":"header"}))
 
-            self.supervisor = directory.get_actor('supervisor')
-            self.subscribe("send-data-iot", self.supervisor.name)
+            # self.supervisor = directory.get_actor('supervisor_' + self.route)
+            # self.subscribe("send-data-" + self.route, self.supervisor.name)
             gevent.spawn(self.loop)
 
 

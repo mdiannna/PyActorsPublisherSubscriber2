@@ -27,38 +27,52 @@ class Pool(Actor):
 
         self.printer_actor = PrinterActor('printeractor', self.message_broker)
         self.web_actor = WebActor('webactor', self.message_broker)
-        self.requestor = Requestor('requestor', self.message_broker, 'iot')
-        # self.requestor = Requestor('requestor2', self.message_broker, 'sensors')
+        self.requestor_iot = Requestor('requestor_iot', self.message_broker, 'iot')
+        self.requestor_sensors = Requestor('requestor_sensors', self.message_broker, 'sensors')
         # self.requestor = Requestor('requestor3', self.message_broker, 'legacy_sensors')
 
-        self.supervisor = WorkerSupervisor("supervisor", self.message_broker, 'iot')
-        # self.supervisor = WorkerSupervisor("supervisor2", self.message_broker, 'sensors')
-        # self.supervisor = WorkerSupervisor("supervisor3", self.message_broker,  'legacy_sensors')
+        self.supervisor_iot = WorkerSupervisor("supervisor_iot", self.message_broker, 'iot')
+        self.supervisor_sensors = WorkerSupervisor("supervisor_sensors", self.message_broker, 'sensors')
+        # self.supervisor_legacy_sensors = WorkerSupervisor("supervisor_legacy_sensors", self.message_broker,  'legacy_sensors')
 
         self.aggregator = Aggregator("aggregator", self.message_broker)
 
         directory.add_actor("messagebroker", self.message_broker)
         directory.add_actor("printeractor", self.printer_actor)
         directory.add_actor("webactor", self.web_actor)
-        directory.add_actor("supervisor", self.supervisor)
-        directory.add_actor("client", self.requestor)
+
+        directory.add_actor("supervisor_iot", self.supervisor_iot)
+        directory.add_actor("supervisor_sensors", self.supervisor_sensors)
+        # directory.add_actor("supervisor_legacy_sensors", self.supervisor_legacy_sensors)
+       
+        # directory.add_actor("client", self.requestor)
+        directory.add_actor("requestor_iot", self.requestor_iot)
+        directory.add_actor("requeestor_sensors", self.requestor_sensors)
+       
         directory.add_actor("aggregator", self.aggregator)
 
     def start(self):
-        # self.message_broker.start()
-        self.message_broker.inbox.put('{"subscribe":"supervisor":"send-data-iot"}')
+        # ??
+        self.message_broker.inbox.put('{"subscribe":"supervisor_iot":"send-data-iot"}')
+        # TODO:
+        self.message_broker.inbox.put('{"subscribe":"supervisor_sensors":"send-data-sensors"}')   
         
         self.printer_actor.start()
         self.web_actor.start()
-        self.requestor.start()
-        self.supervisor.start()
+        self.requestor_iot.start()
+        self.requestor_sensors.start()
+        self.supervisor_iot.start()
+        self.supervisor_sensors.start()
+        # self.supervisor_legacy_sensorss.start()
         self.aggregator.start()
         
-        self.requestor.inbox.put('start')
-        self.supervisor.inbox.put('start')
+        self.requestor_sensors.inbox.put('start')
+        self.supervisor_sensors.inbox.put('start')
+        self.requestor_iot.inbox.put('start')
+        self.supervisor_iot.inbox.put('start')
 
 
-        gevent.joinall([self.requestor, self.supervisor, self.message_broker])
+        gevent.joinall([ self.requestor_sensors, self.supervisor_sensors, self.requestor_iot,self.supervisor_iot,   self.message_broker])
 
     def get_actors(self):
-        return [self.requestor, self.supervisor, self.web_actor, self.printer_actor, self.aggregator]
+        return [self.requestor_iot, self.requestor_sensors, self.supervisor_iot, self.supervisor_sensors, self.web_actor, self.printer_actor, self.aggregator]
