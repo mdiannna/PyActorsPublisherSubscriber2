@@ -30,7 +30,7 @@ class Aggregator(Actor):
             }
 
         self.reinit()
-        self.DELAY_TIME = 5
+        self.DELAY_TIME = 4
         
 
     def start(self):
@@ -81,6 +81,7 @@ class Aggregator(Actor):
             self.publish("print-topic", str({"text":"PREDICTED_WEATHER_FINAL:" + predicted_weather, "type":"green_header"}))
             self.publish("web-data-topic", "PREDICTED_WEATHER_FINAL:" + predicted_weather)
             self.publish("web-data-topic", "DATA:" +str(json.dumps(str(self.sensor_data))))
+            self.last_time = self.current_time
               
             
         self.state = States.Idle

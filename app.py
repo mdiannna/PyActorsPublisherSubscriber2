@@ -40,9 +40,9 @@ def index():
 
 @app.route('/send/<message>')
 def send_message(message):
-    for i in range(1, 10):
-      sse.publish({"message": message}, type='greeting')
-      gevent.sleep(2)
+    # for i in range(1, 10):
+    sse.publish({"message": message}, type='greeting')
+    # gevent.sleep(2)
     return "Message sent!"
 
 
